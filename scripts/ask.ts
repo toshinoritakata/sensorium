@@ -114,9 +114,9 @@ const JSON_SCHEMA = {
 const client = new Anthropic()
 
 const message = await client.messages.create({
-  model: 'claude-opus-4-8',
+  // 入口の構造抽出は軽量なので Haiku で十分（コスト優先）。精度が要れば claude-opus-4-8 へ。
+  model: 'claude-haiku-4-5',
   max_tokens: 4096,
-  thinking: { type: 'adaptive' },
   system: SYSTEM,
   messages: [{ role: 'user', content: text }],
   output_config: { format: { type: 'json_schema', schema: JSON_SCHEMA } },
