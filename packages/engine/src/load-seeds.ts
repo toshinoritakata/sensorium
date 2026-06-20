@@ -1,17 +1,30 @@
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
-import { EquipmentSeedFileSchema, type Equipment } from '@feasisense/shared'
+import {
+  DetectionMethodSeedFileSchema,
+  EquipmentSeedFileSchema,
+  type DetectionMethod,
+  type Equipment,
+} from '@feasisense/shared'
 
 /**
- * data/ の機材シードを読み込んで結合する（開発/テスト用ローダ）。
+ * data/ のシードを読み込む（開発/テスト用ローダ）。
  * エンジン本体は純粋（fs 非依存）。この補助だけが I/O を持つ。
  */
-const SEED_FILES = ['data/equipment.seed.json', 'data/industrial-sensors.seed.json']
+const EQUIPMENT_FILES = ['data/equipment.seed.json', 'data/industrial-sensors.seed.json']
+
+function readJson(rel: string): unknown {
+  const url = new URL(`../../../${rel}`, import.meta.url)
+  return JSON.parse(readFileSync(fileURLToPath(url), 'utf8'))
+}
 
 export function loadAllEquipment(): Equipment[] {
-  return SEED_FILES.flatMap((rel) => {
-    const url = new URL(`../../../${rel}`, import.meta.url)
-    const json = JSON.parse(readFileSync(fileURLToPath(url), 'utf8'))
-    return EquipmentSeedFileSchema.parse(json).equipment
-  })
+  return EQUIPMENT_FILES.flatMap(
+    (rel) => EquipmentSeedFileSchema.parse(readJson(rel)).equipment,
+  )
+}
+
+export function loadAllDetectionMethods(): DetectionMethod[] {
+  return DetectionMethodSeedFileSchema.parse(readJson('data/detection-methods.seed.json'))
+    .detectionMethods
 }

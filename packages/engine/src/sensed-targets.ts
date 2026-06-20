@@ -23,3 +23,13 @@ export function directSensedTargets(eq: Equipment): readonly string[] {
 export function canDetect(eq: Equipment, sensedTarget: string): boolean {
   return directSensedTargets(eq).includes(sensedTarget)
 }
+
+/**
+ * 骨格/身体系の sensedTarget。これらは spatial ハード × DetectionMethod の
+ * ペアで解像が決まる（直接出力ではない）。
+ */
+const SKELETAL_TARGETS = ['presence', 'fullBody', 'limbs', 'hands', 'fingers'] as const
+
+export function isSkeletalTarget(sensedTarget: string): boolean {
+  return (SKELETAL_TARGETS as readonly string[]).includes(sensedTarget)
+}

@@ -8,11 +8,14 @@ export function explain(spec: InteractionSpec, result: EvaluateResult): string {
   const c = spec.context
   const lines: string[] = []
 
+  const parts = [
+    c.area_m2 !== undefined ? `面積 ${c.area_m2}m²` : '面積 指定なし',
+    c.simultaneousUsers !== undefined ? `同時 ${c.simultaneousUsers}人` : '人数 指定なし',
+    `応答 ${c.responsiveness}`,
+    c.budgetJPY ? `予算 ${c.budgetJPY.toLocaleString()}円` : '予算 未指定',
+  ]
   lines.push(`■ 構想: ${spec.title}`)
-  lines.push(
-    `  床 ${c.area_m2}m² / 同時 ${c.simultaneousUsers}人 / 応答 ${c.responsiveness}` +
-      (c.budgetJPY ? ` / 予算 ${c.budgetJPY.toLocaleString()}円` : ' / 予算 未指定'),
-  )
+  lines.push(`  ${parts.join(' / ')}`)
   lines.push(
     `  必要現象: ${spec.phenomena.map((p) => `${p.sensedTarget}${p.label ? `（${p.label}）` : ''}`).join(', ')}`,
   )

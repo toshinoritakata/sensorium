@@ -3,7 +3,9 @@ import type {
   ConditionStatus,
   Discrimination,
   FeedbackKind,
+  Lighting,
 } from '@feasisense/shared'
+import { LIGHTING_LUX } from '../budgets'
 
 /**
  * 連続値の utilization → status。閾値は data/dimensions.seed.json 準拠。
@@ -119,6 +121,76 @@ export function latencyCondition(
     rationale: `応答 ${responseTimeMs}ms vs sensor+detect 予算 ${comfortAllowanceMs}ms（快適）/ ${tolerableAllowanceMs}ms（許容）。工業用センサーは推論加算なしで低遅延が強み。`,
     derivedFrom: '機材 responseTimeMs, responsivenessBudget',
     severity: 'hard',
+  }
+}
+
+/**
+ * precision 次元（spatial ペア）: 必要解像が実効 resolvableTargets に含まれるか。
+ * 候補化でゲート済みなら ok。含まなければ fail。
+ */
+export function precisionCondition(required: string, resolvable: readonly string[]): Condition {
+  const has = resolvable.includes(required)
+  return {
+    dimension: 'precision',
+    status: has ? 'ok' : 'fail',
+    rationale: has
+      ? `必要解像 ${required} を実効解像 [${resolvable.join(', ')}] が含む。`
+      : `必要解像 ${required} を出せない（実効 [${resolvable.join(', ')}]）。`,
+    derivedFrom: 'phenomenon.sensedTarget, ペア resolvableTargets',
+    severity: 'hard',
+  }
+}
+
+/**
+ * capacity 次元（spatial 追跡系）: 同時人数 vs ペアの maxTrackedBodies。
+ * ok<0.8 / warn 0.8–1.0 / fail>1.0。
+ */
+export function trackingCapacityCondition(users: number, maxBodies: number): Condition {
+  const util = users / maxBodies
+  return {
+    dimension: 'capacity',
+    status: utilizationStatus(util, 0.8),
+    currentValue: round(util),
+    threshold: 0.8,
+    operator: 'utilization <',
+    rationale: `同時 ${users} 人 / 追跡上限 ${maxBodies} = 充足率 ${round(util)}。GPU/実装依存で上限は揺れ、満員運用は取りこぼす。`,
+    derivedFrom: 'spec.context.simultaneousUsers, ペア maxTrackedBodies',
+    severity: 'soft',
+  }
+}
+
+/**
+ * lighting 次元: 想定照度帯と機材レンジ/屋外可否の突合。要求なしなら null。
+ * outdoor かつ sunlightOk=false は fail、帯が機材外なら fail、端／mixed は warn。
+ */
+export function lightingCondition(
+  lighting: Lighting | undefined,
+  hw: { minLux: number; maxLux: number; sunlightOk: boolean },
+): Condition | null {
+  if (lighting === undefined) return null
+  const [lo, hi] = LIGHTING_LUX[lighting]
+
+  let status: ConditionStatus
+  let why: string
+  if (lighting === 'outdoor' && !hw.sunlightOk) {
+    status = 'fail'
+    why = '屋外光に未対応（sunlightOk=false）。'
+  } else if (hi < hw.minLux || lo > hw.maxLux) {
+    status = 'fail'
+    why = `想定照度 ${lo}–${hi}lux が機材レンジ ${hw.minLux}–${hw.maxLux}lux の外。`
+  } else if (lo < hw.minLux || hi > hw.maxLux || lighting === 'mixed') {
+    status = 'warn'
+    why = `想定照度 ${lo}–${hi}lux が機材レンジの端にかかる（${lighting}）。外光対策や機種選定の余地。`
+  } else {
+    status = 'ok'
+    why = `想定照度 ${lo}–${hi}lux が機材レンジ ${hw.minLux}–${hw.maxLux}lux に収まる。`
+  }
+  return {
+    dimension: 'lighting',
+    status,
+    rationale: why,
+    derivedFrom: 'spec.context.lighting, 機材 minLux/maxLux/sunlightOk',
+    severity: 'soft',
   }
 }
 

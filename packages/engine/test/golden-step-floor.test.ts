@@ -138,4 +138,55 @@ describe('golden: 踏んだら反応する床（step → 感圧マット）', ()
     expect(statuses(led).capacity).toBe('ok')
     expect(isFeasible(led)).toBe(true)
   })
+
+  it('即応 tight では LEDフロア(30ms)が latency warn、安全マット(20ms)は ok', () => {
+    const result = evaluate(
+      stepFloorSpec({ responsiveness: 'tight', budgetJPY: 3_000_000 }),
+      equipment,
+    )
+    // tight: comfortAllowance=25, tolerableAllowance=55。
+    expect(statuses(setupOf(result, 'interactive-led-floor')).latency).toBe('warn')
+    expect(statuses(setupOf(result, 'pressure-safety-mat')).latency).toBe('ok')
+  })
+
+  it('weight 現象も感圧マットが直接検出して候補化する', () => {
+    const spec = stepFloorSpec()
+    spec.phenomena[0] = { id: 'ph-weight', sensedTarget: 'weight', label: '乗った重さ' }
+    const result = evaluate(spec, equipment)
+    expect(result.primaryPhenomenonId).toBe('ph-weight')
+    expect(result.setups.map((s) => s.anchorEquipmentId)).toContain('pressure-safety-mat')
+  })
+
+  it('予算未指定なら budget は情報表示（fail にならず成立する）', () => {
+    const spec = stepFloorSpec({ budgetJPY: undefined })
+    const setup = setupOf(evaluate(spec, equipment), 'pressure-safety-mat')
+    const budget = setup.conditions.find((c) => c.dimension === 'budget')!
+    expect(budget.severity).toBe('info')
+    expect(budget.currentValue).toBe(560_000)
+    expect(isFeasible(setup)).toBe(true)
+  })
+
+  it('面積の無い構想ではタイル系（感圧マット）は候補から外れ、理由を残す', () => {
+    const spec: InteractionSpec = {
+      id: 'spec-no-area',
+      title: '面積を持たない踏み（キオスク足元の一点）',
+      context: { responsiveness: 'normal' }, // area_m2 も simultaneousUsers も無し。
+      phenomena: [{ id: 'ph-step', sensedTarget: 'step', label: '踏む' }],
+    }
+    const result = evaluate(spec, equipment)
+    expect(result.setups).toHaveLength(0)
+    expect(result.notes?.some((n) => n.includes('面積'))).toBe(true)
+  })
+
+  it('直接検出できない現象（voiceCommand）は候補ゼロで理由を返す', () => {
+    const spec: InteractionSpec = {
+      id: 'spec-voice',
+      title: '声で反応',
+      context: { area_m2: 6, simultaneousUsers: 1, responsiveness: 'relaxed' },
+      phenomena: [{ id: 'ph-voice', sensedTarget: 'voiceCommand', label: '音声コマンド' }],
+    }
+    const result = evaluate(spec, equipment)
+    expect(result.setups).toHaveLength(0)
+    expect(result.notes?.length ?? 0).toBeGreaterThan(0)
+  })
 })

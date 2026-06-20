@@ -7,9 +7,13 @@ import { FeedbackKind } from './feedback'
  */
 
 export const Responsiveness = z.enum(['tight', 'normal', 'relaxed'])
+export type Responsiveness = z.infer<typeof Responsiveness>
 export const Lighting = z.enum(['controlled', 'mixed', 'bright', 'dark', 'outdoor'])
+export type Lighting = z.infer<typeof Lighting>
 export const AmbientNoise = z.enum(['quiet', 'moderate', 'loud'])
+export type AmbientNoise = z.infer<typeof AmbientNoise>
 export const Provenance = z.enum(['stated', 'inferred', 'assumed'])
+export type Provenance = z.infer<typeof Provenance>
 
 /**
  * 空間弁別の要求度。capacity 次元の意味を決める。
@@ -46,8 +50,9 @@ export const InteractionSpecSchema = z.object({
   id: z.string(),
   title: z.string(),
   context: z.object({
-    area_m2: z.number().positive(),
-    simultaneousUsers: z.number().int().positive(),
+    // 面積は「現象しだいの文脈」。床/面を覆う体験だけが要求する（普遍の必須ではない）。
+    area_m2: z.number().positive().optional(),
+    simultaneousUsers: z.number().int().positive().optional(),
     responsiveness: Responsiveness,
     lighting: Lighting.optional(),
     ambientNoise: AmbientNoise.optional(),

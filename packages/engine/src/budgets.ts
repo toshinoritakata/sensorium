@@ -27,3 +27,16 @@ export function sensorLatencyAllowance(spec: InteractionSpec): {
 
 /** 床敷設センサー（感圧マット/カーテン）のタイル充填効率。カメラ床射影(0.7)より高い。 */
 export const FLOOR_PACKING_EFFICIENCY = 0.9
+
+/**
+ * lighting enum → 想定照度帯[lux]。data/dimensions.seed.json mappings.lightingLux をミラー。
+ * 機材の [minLux, maxLux] / sunlightOk と突合する。
+ */
+export const LIGHTING_LUX = {
+  controlled: [100, 500],
+  mixed: [50, 2000],
+  bright: [500, 5000],
+  dark: [0, 50],
+  outdoor: [1000, 100000],
+} as const
+

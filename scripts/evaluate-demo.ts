@@ -1,12 +1,13 @@
 import type { InteractionSpec } from '@feasisense/shared'
 import { evaluate, explain } from '@feasisense/engine'
-import { loadAllEquipment } from '@feasisense/engine/load-seeds'
+import { loadAllDetectionMethods, loadAllEquipment } from '@feasisense/engine/load-seeds'
 
 /**
  * 入力（構想）→ 出力（機材案）を目で確認するための手回しツール。
  * ここを書き換えて pnpm eval で叩き、精度を詰める。
  */
 const equipment = loadAllEquipment()
+const detectionMethods = loadAllDetectionMethods()
 
 const scenarios: InteractionSpec[] = [
   {
@@ -48,10 +49,16 @@ const scenarios: InteractionSpec[] = [
       },
     ],
   },
+  {
+    id: 'demo-kiosk-hands',
+    title: 'キオスクで手を振る（面積なし・hands・即応）',
+    context: { simultaneousUsers: 1, responsiveness: 'tight', lighting: 'controlled', budgetJPY: 200_000 },
+    phenomena: [{ id: 'ph-hands', sensedTarget: 'hands', label: '手の検出', provenance: 'stated' }],
+  },
 ]
 
 for (const spec of scenarios) {
   console.log('='.repeat(72))
-  console.log(explain(spec, evaluate(spec, equipment)))
+  console.log(explain(spec, evaluate(spec, equipment, detectionMethods)))
   console.log('')
 }
