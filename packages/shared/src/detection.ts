@@ -20,6 +20,8 @@ export const DetectionMethodSchema = z.object({
   /** 消費する入力ストリーム。未指定なら compatibleWith から導出（pairing.ts）。 */
   inputModality: z.array(InputModality).optional(),
   algorithmFamily: AlgorithmFamily.optional(),
+  /** 堅牢性タグ（Pareto の軸。未指定なら algorithmFamily から導出）。 */
+  robustness: z.enum(['low', 'med', 'high']).optional(),
   license: z.object({
     model: z.enum(['oss', 'commercial', 'bundled']),
     price: z.number(),

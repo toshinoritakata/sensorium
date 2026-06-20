@@ -21,6 +21,7 @@ import {
   type SpatialEquipment,
 } from './pairing'
 import { FLOOR_PACKING_EFFICIENCY, sensorLatencyAllowance } from './budgets'
+import { annotatePareto, detectionRobustness, precisionRank } from './pareto'
 import {
   budgetCondition,
   capacityCondition,
@@ -64,6 +65,7 @@ export function evaluate(
   const spatialSetups = buildSpatialSetups(spec, primary, equipment, detectionMethods)
 
   const setups = [...directSetups, ...spatialSetups]
+  annotatePareto(setups) // 成立案の被支配を注記（破壊的でなく注記のみ）。
 
   if (setups.length === 0 && notes.length === 0) {
     notes.push(
@@ -133,6 +135,13 @@ function buildSpatialSetup(
     conditions,
     totalCostJPY,
     paretoLabels: [],
+    metrics: {
+      costJPY: totalCostJPY,
+      latencyMs: pairLatencyMs(hw, dm),
+      capacityHeadroom: pairMaxBodies(hw, dm) / users,
+      robustness: detectionRobustness(dm),
+      precisionRank: precisionRank(targets),
+    },
   }
 }
 
@@ -204,6 +213,14 @@ function buildPressureMatSetup(
     conditions,
     totalCostJPY,
     paretoLabels,
+    metrics: {
+      costJPY: totalCostJPY,
+      latencyMs: mat.responseTimeMs,
+      // occupancy はトリガーのみ＝定員無制限。zoned/per-user は独立ゾーン数で余裕を測る。
+      capacityHeadroom: discrimination === 'occupancy' ? Infinity : addressableZones / users,
+      robustness: 3, // 工業センサーは堅牢・オクルージョン無縁。
+      precisionRank: 1,
+    },
     mountPlan: {
       equipmentId: mat.id,
       count,

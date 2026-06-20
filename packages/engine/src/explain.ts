@@ -27,8 +27,15 @@ export function explain(spec: InteractionSpec, result: EvaluateResult): string {
     return lines.join('\n')
   }
 
-  lines.push(`機材案 ${result.setups.length} 件:`)
-  result.setups.forEach((s, i) => {
+  const frontier = result.setups.filter((s) => s.paretoOptimal !== false).length
+  lines.push(`機材案 ${result.setups.length} 件（Pareto最適 ${frontier} 件）:`)
+  // Pareto最適を先頭に、その中は安い順に。
+  const ordered = [...result.setups].sort((a, b) => {
+    const pa = a.paretoOptimal === false ? 1 : 0
+    const pb = b.paretoOptimal === false ? 1 : 0
+    return pa - pb || a.totalCostJPY - b.totalCostJPY
+  })
+  ordered.forEach((s, i) => {
     lines.push('')
     lines.push(explainSetup(s, i + 1))
   })
@@ -37,7 +44,8 @@ export function explain(spec: InteractionSpec, result: EvaluateResult): string {
 
 function explainSetup(s: Setup, n: number): string {
   const lines: string[] = []
-  lines.push(`【案${n}】${s.label}   ${s.totalCostJPY.toLocaleString()}円`)
+  const mark = s.paretoOptimal === false ? '（劣位）' : s.paretoOptimal ? '★Pareto最適' : ''
+  lines.push(`【案${n}】${s.label}   ${s.totalCostJPY.toLocaleString()}円  ${mark}`)
   if (s.paretoLabels.length) lines.push(`  ラベル: ${s.paretoLabels.join(', ')}`)
   if (s.mountPlan) lines.push(`  設置: ${s.mountPlan.layout ?? `${s.mountPlan.count}台`}`)
   for (const cond of s.conditions) {

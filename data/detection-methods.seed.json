@@ -115,6 +115,22 @@
     },
 
     {
+      "id": "opencv-hand-contour",
+      "name": "OpenCV 手検出（輪郭/肌色）",
+      "vendor": "OSS (OpenCV)",
+      "inputModality": ["rgb", "ir"],
+      "algorithmFamily": "classical-cv",
+      "robustness": "low",
+      "license": { "model": "oss", "price": 0, "verify": false },
+      "compatibleWith": { "depthType": ["none", "passive-stereo", "active-stereo", "tof"] },
+      "providesTargets": ["hands"],
+      "maxTrackedBodies": 1,
+      "addedLatencyMs": 10,
+      "computeNeed": "CPUで動く軽量。前処理（背景差分/肌色閾値）に敏感",
+      "confidence": { "providesTargets": "low (2D・照明/背景依存)", "addedLatencyMs": "high (軽量)" },
+      "notes": "古典CVの手検出。**安価・低遅延だが照明/背景/肌色に弱く堅牢性が低い**。RGB/IRどちらの画像でも動く。学習不要だがチューニングが要る。MediaPipe より精度・安定性は劣る。"
+    },
+    {
       "id": "whisper-local",
       "name": "Whisper (ローカル音声認識)",
       "vendor": "OpenAI (OSS)",

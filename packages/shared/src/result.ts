@@ -37,6 +37,17 @@ export const ChannelSchema = z.object({
 
 export type Channel = z.infer<typeof ChannelSchema>
 
+/** Pareto 比較に使う多軸メトリクス（全数値トレース可）。 */
+export const MetricsSchema = z.object({
+  costJPY: z.number(),
+  latencyMs: z.number(),
+  capacityHeadroom: z.number(),
+  robustness: z.number(),
+  precisionRank: z.number(),
+})
+
+export type Metrics = z.infer<typeof MetricsSchema>
+
 /** 機材構成1案（主 Channel の sense でアンカー）。 */
 export const SetupSchema = z.object({
   id: z.string(),
@@ -47,6 +58,10 @@ export const SetupSchema = z.object({
   totalCostJPY: z.number(),
   paretoLabels: z.array(z.string()),
   mountPlan: MountPlanSchema.optional(),
+  metrics: MetricsSchema.optional(),
+  /** 成立案の中で Pareto 最適か（被支配でないか）。annotatePareto が設定。 */
+  paretoOptimal: z.boolean().optional(),
+  dominatedBy: z.array(z.string()).optional(),
 })
 
 export type Setup = z.infer<typeof SetupSchema>

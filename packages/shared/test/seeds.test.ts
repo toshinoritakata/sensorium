@@ -33,11 +33,14 @@ describe('seed validation — Zod が data/*.seed.json を受理する', () => {
     expect(mat?.category).toBe('pressure-mat')
   })
 
-  it('detection-methods.seed.json（検出ソフト 12点）', () => {
+  it('detection-methods.seed.json（検出ソフト 12点＋OpenCV）', () => {
     const parsed = DetectionMethodSeedFileSchema.parse(
       loadJson('data/detection-methods.seed.json'),
     )
-    expect(parsed.detectionMethods).toHaveLength(12)
+    expect(parsed.detectionMethods).toHaveLength(13)
+    const opencv = parsed.detectionMethods.find((d) => d.id === 'opencv-hand-contour')
+    expect(opencv?.algorithmFamily).toBe('classical-cv')
+    expect(opencv?.robustness).toBe('low')
   })
 
   it('dimensions.seed.json（判定次元 11点）', () => {
