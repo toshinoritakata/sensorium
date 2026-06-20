@@ -1,4 +1,4 @@
-import type { DetectionMethod, Equipment } from '@feasisense/shared'
+import type { DetectionMethod, Equipment, InputModality } from '@feasisense/shared'
 
 /** spatial 光学ハードウェア（depthType を持つ category:'spatial'）。 */
 export type SpatialEquipment = Extract<Equipment, { category: 'spatial' }>
@@ -8,17 +8,57 @@ export function isSpatial(e: Equipment): e is SpatialEquipment {
 }
 
 /**
+ * ハードが出せるストリーム。seed の producesModality を優先、無ければ depthType/sensingMethod から導出。
+ * 例外（Leap=IRのみ等）は seed の producesModality で上書きする。
+ */
+export function producesModality(hw: SpatialEquipment): InputModality[] {
+  if (hw.producesModality) return hw.producesModality
+  switch (hw.depthType) {
+    case 'tof':
+    case 'active-stereo':
+      return ['depth', 'ir', 'rgb']
+    case 'passive-stereo':
+      return ['depth', 'rgb']
+    case 'lidar':
+      return ['pointcloud']
+    case 'none':
+      return hw.sensingMethod.includes('marker-mocap') ? ['ir'] : ['rgb']
+  }
+}
+
+/** 検出ソフトが消費するストリーム。seed の inputModality を優先、無ければ compatibleWith から導出。 */
+export function inputModality(dm: DetectionMethod): InputModality[] {
+  if (dm.inputModality) return dm.inputModality
+  const c = dm.compatibleWith
+  if (c.sensingMethod?.includes('acoustic-mic')) return ['audio']
+  if (c.depthType?.includes('none')) return ['rgb']
+  if (c.depthType?.includes('lidar')) return ['pointcloud']
+  if (c.depthType && c.depthType.length > 0) return ['depth']
+  return ['rgb']
+}
+
+/**
  * ハードと DetectionMethod が組めるか。
- * 固定ペア（equipmentIds 指定: ZED/Leap/OptiTrack 等）か、depthType 互換で判定。
+ * 固定ペア（equipmentIds 指定: ZED/Leap/OptiTrack 等）は機種限定、それ以外はモダリティ整合で判定。
  */
 export function isCompatible(hw: SpatialEquipment, dm: DetectionMethod): boolean {
   const c = dm.compatibleWith
-  // equipmentIds 指定は「固定ペア」。指定があれば depthType で広げず、その機種に限定する。
+  // equipmentIds 指定は「固定ペア」。指定があればその機種に限定する。
   if (c.equipmentIds && c.equipmentIds.length > 0) {
     return c.equipmentIds.includes(hw.id)
   }
-  if (c.depthType) return c.depthType.includes(hw.depthType)
-  return false
+  // ハードが出すモダリティ ⊇ ソフトが要るモダリティ（一つでも噛み合えば可）。
+  const hwMods = producesModality(hw)
+  return inputModality(dm).some((m) => hwMods.includes(m))
+}
+
+/** このペアで実際に使われるストリーム（lighting 評価に渡す）。 */
+export function consumedModality(
+  hw: SpatialEquipment,
+  dm: DetectionMethod,
+): InputModality | undefined {
+  const hwMods = producesModality(hw)
+  return inputModality(dm).find((m) => hwMods.includes(m))
 }
 
 /**

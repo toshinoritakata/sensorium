@@ -1,4 +1,5 @@
 export * from './feedback'
+export * from './modality'
 export * from './equipment'
 export * from './detection'
 export * from './dimensions'

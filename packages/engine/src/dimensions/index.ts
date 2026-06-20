@@ -3,6 +3,7 @@ import type {
   ConditionStatus,
   Discrimination,
   FeedbackKind,
+  InputModality,
   Lighting,
 } from '@feasisense/shared'
 import { LIGHTING_LUX } from '../budgets'
@@ -166,9 +167,22 @@ export function trackingCapacityCondition(users: number, maxBodies: number): Con
 export function lightingCondition(
   lighting: Lighting | undefined,
   hw: { minLux: number; maxLux: number; sunlightOk: boolean },
+  modality?: InputModality,
 ): Condition | null {
   if (lighting === undefined) return null
   const [lo, hi] = LIGHTING_LUX[lighting]
+
+  // RGB ストリームは自前の光源を持たず、暗所では被写体が見えない。
+  // 同じカメラでも depth/IR 経路（能動照明）は暗所で動くため、ここで経路ごとに分かれる。
+  if (modality === 'rgb' && lighting === 'dark') {
+    return {
+      dimension: 'lighting',
+      status: 'fail',
+      rationale: `RGB 経路は暗所（${lo}–${hi}lux）で被写体を捉えられない。同じ機材でも IR/深度 経路なら成立しうる。`,
+      derivedFrom: 'spec.context.lighting, 経路モダリティ=rgb',
+      severity: 'soft',
+    }
+  }
 
   let status: ConditionStatus
   let why: string

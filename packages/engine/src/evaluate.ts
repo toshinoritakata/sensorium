@@ -11,6 +11,7 @@ import type {
 } from '@feasisense/shared'
 import { canDetect, isSkeletalTarget } from './sensed-targets'
 import {
+  consumedModality,
   isCompatible,
   isSpatial,
   pairCostJPY,
@@ -117,7 +118,7 @@ function buildSpatialSetup(
     budgetCondition(totalCostJPY, spec.context.budgetJPY),
   ]
 
-  const lit = lightingCondition(spec.context.lighting, hw)
+  const lit = lightingCondition(spec.context.lighting, hw, consumedModality(hw, dm))
   if (lit) conditions.push(lit)
 
   const requiredFeedback: FeedbackKind[] = (spec.feedback ?? []).map((f) => f.kind)

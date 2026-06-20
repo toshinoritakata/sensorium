@@ -153,6 +153,7 @@
       "servesModality": ["gesture"],
       "category": "spatial",
       "depthType": "active-stereo",
+      "producesModality": ["ir"],
       "price": { "value": 20000, "currency": "JPY", "asOf": "2026-01", "verify": true },
       "interface": { "type": "usb", "spec": "USB2.0", "connector": "USB-C", "maxCableLength_m": 3, "power": "bus-powered" },
       "powerW": 2,

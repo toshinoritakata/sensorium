@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { FeedbackKind } from './feedback'
+import { InputModality } from './modality'
 
 /**
  * Equipment スキーマ（data/equipment.schema.md の写像）。
@@ -68,6 +69,8 @@ const base = z.object(equipmentBase)
 export const SpatialEquipment = base.extend({
   category: z.literal('spatial'),
   depthType: z.enum(['tof', 'active-stereo', 'passive-stereo', 'lidar', 'none']),
+  /** 出せるストリーム。未指定なら depthType/sensingMethod から導出（pairing.ts）。 */
+  producesModality: z.array(InputModality).optional(),
   fovH: z.number(),
   fovV: z.number(),
   usableRange: tuple2,

@@ -67,6 +67,25 @@ describe('spatial: 手の検出（ハード × 検出ソフトのペア合成）
     expect(statuses(rgb).lighting).toBe('ok')
   })
 
+  it('暗所では同じカメラでも RGB 経路は lighting fail、深度経路は通る', () => {
+    const result = evaluate(handsSpec({ budgetJPY: 300_000, lighting: 'dark' }), equipment, detectionMethods)
+
+    // Azure Kinect + MediaPipe は RGB ストリームを使う → 暗所で fail。
+    const rgbPath = byId(result, 'setup-azure-kinect-dk+mediapipe-pose')!
+    expect(statuses(rgbPath).lighting).toBe('fail')
+    expect(isFeasible(rgbPath)).toBe(false)
+
+    // Azure Kinect + Body Tracking は depth ストリーム → 暗所でも ok。
+    const depthPath = byId(result, 'setup-azure-kinect-dk+ms-body-tracking-sdk')!
+    expect(statuses(depthPath).lighting).toBe('ok')
+  })
+
+  it('固定ペアでない MediaPipe は RGB を出さない Leap とは組まない', () => {
+    const result = evaluate(handsSpec({ budgetJPY: 200_000 }), equipment, detectionMethods)
+    // Leap は producesModality=[ir]。MediaPipe(rgb) とはモダリティが噛み合わない。
+    expect(byId(result, 'setup-ultraleap-lmc2+mediapipe-pose')).toBeUndefined()
+  })
+
   it('DetectionMethod を渡さなければ spatial 候補は出ない（後方互換）', () => {
     const result = evaluate(handsSpec({ budgetJPY: 200_000 }), equipment)
     expect(result.setups).toHaveLength(0)
