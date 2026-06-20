@@ -1,0 +1,158 @@
+{
+  "_meta": {
+    "description": "FeasiSense 11次元の判定定義。各次元の currentValue 算出・hardThreshold(fail境界)・softMargin(warn帯)・系統。閾値は経験則デフォルトで全て調整可能。",
+    "statusModel": "fail=hardThreshold侵犯(物理的に不成立) / warn=成立するがsoftMargin帯(余裕なし) / ok=帯より外で安定。CONTEXT.md status 参照。",
+    "tuningNote": "数値は2026-01時点の現場経験則ベースの初期値。confidence: low の閾値は実プロジェクトで要キャリブ。TDが次元定義ごと上書き可能。",
+    "industrialSensorNote": "工業用センサー系(presence-point/distance-1d/area-curtain/pressure-mat/motion-pir/radar-presence)は DetectionMethod を持たず直接出力。各次元の解釈を読み替える: latency=responseTimeMs(推論加算なし、低遅延が強み)。precision=機材自身の sensedTarget が必要targetを満たすか(ペア合成しない)。capacity=人体追跡数でなく『ゾーン/検出点の数 vs 必要弁別数』(感圧マット枚数・カーテンのビーム本数・配列数)。coverage=1台の検出範囲(sensingDistance/measureRange/coverageW×H/area_m2)×台数。occlusion=点/面検知は人の重なりに概ね強い(densityFactorを大幅低減 or 非適用)。"
+  },
+
+  "mappings": {
+    "lightingLux": {
+      "_note": "lighting enum → 想定照度帯[lux]。lighting条件で機材の[minLux,maxLux]と突合",
+      "controlled": [100, 500],
+      "mixed": [50, 2000],
+      "bright": [500, 5000],
+      "dark": [0, 50],
+      "outdoor": [1000, 100000],
+      "confidence": "med"
+    },
+    "ambientNoiseDb": {
+      "_note": "ambientNoise enum → 想定騒音[dB SPL]。noise条件で機材noiseToleranceDbと突合",
+      "quiet": 40,
+      "moderate": 60,
+      "loud": 75,
+      "confidence": "med"
+    },
+    "responsivenessBudget": {
+      "_note": "responsiveness → motion-to-photon 総予算[ms]。comfort=ok上限, tolerable=warn上限, それ超でfail。downstreamAllowance を引いた残りが sensor+detect 予算",
+      "tight":   { "comfortMs": 50,  "tolerableMs": 80,  "downstreamAllowanceMs": 25 },
+      "normal":  { "comfortMs": 80,  "tolerableMs": 130, "downstreamAllowanceMs": 45 },
+      "relaxed": { "comfortMs": 150, "tolerableMs": 250, "downstreamAllowanceMs": 80 },
+      "confidence": "med",
+      "note": "downstreamAllowance は TD 上書き可(CONTEXT.md downstreamAllowance)。tight は鏡像/楽器的な即応、relaxed は発話→反応に間が許される体験。"
+    },
+    "occupancyArea": {
+      "_note": "safety①個人空間: 1人あたり最小占有面積[m²/人]。usageModel × 動きの大きさで変動。{hard, soft}",
+      "walkUp_gesture_large": { "hard": 2.5, "soft": 4.0 },
+      "walkUp_gesture_small": { "hard": 1.5, "soft": 2.5 },
+      "dwell_touch":          { "hard": 0.8, "soft": 1.2 },
+      "guided":               { "hard": 1.0, "soft": 1.5 },
+      "confidence": "low",
+      "note": "hard未満で衝突/不快、soft未満で warn。large=全身で腕を大きく振る体験。"
+    }
+  },
+
+  "dimensions": [
+    {
+      "key": "area",
+      "system": "equipment",
+      "currentValue": "Spec の required area [m²]",
+      "compute": "maxCoverable = Σ_台 (床射影フットプリント) × packingEfficiency(≈0.7)。typicalCoverageArea があればそれを優先。床射影はハードの fovH/fovV/usableRange と MountPlan(高さ/俯角) から算出。",
+      "evaluate": "utilization = required / maxCoverable。ok: <0.85 / warn: 0.85–1.0 / fail: >1.0",
+      "softMargin": "utilization 0.85–1.0（キャリブずれ・端の欠落・人の動きで実効カバーが縮むため余裕代15%）",
+      "confidence": "med",
+      "rationale": "端ギリギリ設計は実運用で必ず破綻する。85%で警告し台数追加か面積縮小を促す。"
+    },
+    {
+      "key": "capacity",
+      "system": "equipment",
+      "currentValue": "Spec の simultaneousUsers [人]",
+      "compute": "effectiveMax = pair.maxTrackedBodies × 台数 × occlusionDerate(occlusion指数から0.5–1.0)。",
+      "evaluate": "utilization = users / effectiveMax。ok: <0.8 / warn: 0.8–1.0 / fail: >1.0",
+      "softMargin": "0.8–1.0（人は離散・出入りで瞬間的に定員超過しやすく、満員運用は取りこぼす）",
+      "confidence": "med",
+      "rationale": "maxTrackedBodies 自体が GPU/実装依存(機材DB confidence参照)。occlusion と連動して実効定員が落ちる点に注意。"
+    },
+    {
+      "key": "precision",
+      "system": "equipment",
+      "currentValue": "Spec の sensedTargets（必要解像）",
+      "compute": "実効 resolvableTargets = DetectionMethod.providesTargets ∩ (ハード depthType が許す範囲)。",
+      "evaluate": "fail: 必要targetが実効集合に無い / warn: 集合にあるが marginal(低信頼ペア) / ok: robust に含む",
+      "softMargin": "marginal 例: passive-rgb×姿勢推定の hands(2.5Dで奥行不定)、非mocap の fingers、>有効距離での fullBody",
+      "confidence": "med",
+      "rationale": "集合包含は二値だが『出せるが怪しい』を warn にしないと、RGB+MLでfingers要求を○と誤る。marginal タグはペア定義で持つ。"
+    },
+    {
+      "key": "latency",
+      "system": "equipment",
+      "currentValue": "sensorLatencyMs + DetectionMethod.addedLatencyMs + マルチセンサー同期ペナルティ(台数>1で+5〜15ms)",
+      "compute": "予算 = responsivenessBudget.comfortMs − downstreamAllowanceMs（sensor+detect の持ち分）。",
+      "evaluate": "ok: current ≤ (comfort−allowance) / warn: ≤ (tolerable−allowance) / fail: それ超",
+      "softMargin": "comfort と tolerable の差帯。体感上わずかに重いが許容される範囲。",
+      "confidence": "med",
+      "rationale": "下流(描画等)はスコープ外なので allowance として明示的に差し引く(ADR-0001/ downstreamAllowance)。Whisper等の大addedLatencyは即応体験で即fail。"
+    },
+    {
+      "key": "lighting",
+      "system": "equipment",
+      "currentValue": "Spec lighting → lightingLux 帯",
+      "compute": "環境照度帯と機材[minLux,maxLux]の包含。outdoor は sunlightOk 必須。",
+      "evaluate": "fail: 帯が機材レンジ外 / 屋外でsunlightOk=false。warn: 帯が機材レンジの端にかかる or mixed(変動大)。ok: 余裕を持って内側",
+      "softMargin": "環境帯の端が機材レンジ端から20%以内、または lighting=mixed",
+      "confidence": "med",
+      "rationale": "照明は会期中に変わる(自然光・演出照明)。mixed や端は warn で外光対策・パッシブ機検討を促す。"
+    },
+    {
+      "key": "mounting",
+      "system": "equipment",
+      "currentValue": "機材 mountingNeed と MountPlan(高さ/俯角/台数)",
+      "compute": "必要マウント種別 ∈ Spec.mounting か。MountPlan の高さ/俯角が mountAdjustable 範囲内か。interface.maxCableLength_m vs 設置距離。powerW vs 給電方式。",
+      "evaluate": "fail: 必要マウントが利用不可 / 最適幾何が可動範囲外。warn: ケーブル長超過(延長要) / PoE枠超過(外部電源要) / 可動範囲の端。ok: 余裕内",
+      "softMargin": "ケーブル長・PoE枠・可動域が境界付近（将来フック、CONTEXT/スキーマ参照）",
+      "confidence": "low",
+      "rationale": "設置可否は提案の現実性そのもの。ケーブル長・給電を warn 化することで『動くが施工が要る』を可視化。"
+    },
+    {
+      "key": "noise",
+      "system": "equipment",
+      "currentValue": "Spec ambientNoise → ambientNoiseDb（音声Channel時のみ）",
+      "compute": "環境騒音dB vs 機材 noiseToleranceDb。",
+      "evaluate": "ok: ambient ≤ tolerance−5dB / warn: tolerance−5 〜 tolerance / fail: > tolerance",
+      "softMargin": "許容まで5dB以内（騒音は変動し、5dBは体感2倍弱の余裕代）",
+      "confidence": "low",
+      "rationale": "noiseToleranceDb 自体が環境依存で confidence 低。指向性マイク/アレイで実効SNRを上げる方向の示唆に繋げる。"
+    },
+    {
+      "key": "occlusion",
+      "system": "both",
+      "currentValue": "occlusionRisk 指数 = densityFactor(ρ) × vantagePenalty × (1 / redundancyMitigation)",
+      "compute": "ρ = users/area。densityFactor: ρ<0.15→低, 0.15–0.3→中, >0.3→高(p/m²)。vantagePenalty: 俯角>60°(真上)→0.6, 斜め→1.0, 正面(目線)→1.5。redundancyMitigation = 1 + 0.5×(重複視点数−1)。",
+      "evaluate": "ok: risk < 0.15 / warn: 0.15–0.30 / fail: >0.30",
+      "softMargin": "中密度帯。Intrinsic(密度)由来は Setup を変えても残り、Equipment(視点/冗長)由来は Setup で動く。",
+      "confidence": "low",
+      "rationale": "occlusion は確率的で実測必須。指数は相対比較と What-if の効き方を見るための代理。閾値は最優先で要キャリブ。CONTEXT.md occlusion 参照。"
+    },
+    {
+      "key": "safety",
+      "system": "intrinsic",
+      "currentValue": "area/users [m²/人]、衝突半径、動線幅",
+      "compute": "①個人空間: area/users vs occupancyArea(usageModel×動き){hard,soft}。②衝突半径: gesture_large で対人間隔 ≥ 腕振り半径(≈1.0m)。③動線: permanent で通路幅 ≥ 1.2m(目安)。",
+      "evaluate": "fail: area/users < hard / 衝突半径侵犯。warn: hard〜soft帯 / 動線が目安未満。ok: soft以上",
+      "softMargin": "occupancyArea の hard〜soft 帯（mappings 参照）",
+      "confidence": "low",
+      "disclaimer": "**設計目安であり建築基準・消防等の法令判断ではない**(CONTEXT.md safety)。出力に免責表示。",
+      "rationale": "Intrinsic なので機材前から効き、密度設計の初期ガードになる。基準値は現場/規定で上書き可。"
+    },
+    {
+      "key": "interference",
+      "system": "equipment",
+      "currentValue": "Setup 内で発火した InterferenceRule の集合",
+      "compute": "Setup の機材 sensingMethod タグの組を InterferenceRule と突合(interference-rules.seed.json)。",
+      "evaluate": "fail: rule.severity=high かつ緩和策未適用。warn: severity=med、または緩和策で低減見込み。ok: 発火なし",
+      "softMargin": "緩和策(指向性化/時分割/物理距離/混在)が存在し適用余地がある場合は warn 止まり",
+      "confidence": "med",
+      "rationale": "ルールは方式タグ単位(CONTEXT.md interference)。緩和策の有無で fail/warn を分ける。"
+    },
+    {
+      "key": "budget",
+      "system": "equipment",
+      "currentValue": "Setup 総額 = Σ(機材price + DetectionMethod license)、**共有 role は1回計上**",
+      "compute": "verify:true の価格は置き値である旨フラグ。",
+      "evaluate": "ok: <0.9×budget / warn: 0.9–1.1×budget / fail: >1.1×budget",
+      "softMargin": "予算の±10%（見積りは交渉/付帯費で振れる）。Spec.budget 未指定なら budget条件は評価せず情報表示のみ",
+      "confidence": "low",
+      "rationale": "価格が全て要検証(機材DB)なので budget は参考。共有roleの二重計上回避が効く(CONTEXT.md role)。"
+    }
+  ]
+}

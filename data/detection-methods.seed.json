@@ -1,0 +1,166 @@
+{
+  "_meta": {
+    "description": "FeasiSense シード DetectionMethod DB。光学ハードとペアで sense role を埋める検出ソフト。ユーザー編集可能。2026-01時点。",
+    "verifyPolicy": "ライセンス費・対応状況は要検証。providesTargets/maxTrackedBodies/addedLatencyMs は実装・ハード・人数で変動するため confidence 明記。",
+    "pairingRule": "実効 resolvableTargets = providesTargets ∩ (ハードの depthType が許す範囲)。latency = ハード.sensorLatencyMs + addedLatencyMs。maxTrackedBodies = min(ハード現実上限, ここの値)。"
+  },
+  "detectionMethods": [
+    {
+      "id": "ms-body-tracking-sdk",
+      "name": "Azure Kinect Body Tracking SDK",
+      "vendor": "Microsoft",
+      "license": { "model": "oss", "price": 0, "verify": true },
+      "compatibleWith": { "depthType": ["tof"], "equipmentIds": ["azure-kinect-dk", "orbbec-femto-mega", "orbbec-femto-bolt"] },
+      "providesTargets": ["presence", "fullBody", "limbs", "hands"],
+      "maxTrackedBodies": 6,
+      "addedLatencyMs": 30,
+      "computeNeed": "NVIDIA GPU 必須 (CUDA/DirectML)。人数増でGPU負荷増",
+      "confidence": { "providesTargets": "high", "maxTrackedBodies": "med (GPU依存・実質5-6)", "addedLatencyMs": "med (GPU性能依存)" },
+      "notes": "Kinect/Orbbec ToF 用の定番骨格。手は粗(指は不可)。GPUがボトルネックで同時人数とレイテンシがトレードオフ。"
+    },
+    {
+      "id": "nuitrack",
+      "name": "Nuitrack SDK",
+      "vendor": "3DiVi",
+      "license": { "model": "commercial", "price": 50000, "verify": true },
+      "compatibleWith": { "depthType": ["tof", "active-stereo"] },
+      "providesTargets": ["presence", "fullBody", "limbs"],
+      "maxTrackedBodies": 6,
+      "addedLatencyMs": 30,
+      "computeNeed": "GPU推奨。CPUでも可だが人数で重い",
+      "confidence": { "providesTargets": "high", "maxTrackedBodies": "med", "addedLatencyMs": "med" },
+      "notes": "深度カメラ横断(RealSense等)で骨格。RealSense に骨格を与える代表手段。商用ライセンス(台数/年課金、価格は要検証の置き値)。"
+    },
+    {
+      "id": "mediapipe-pose",
+      "name": "MediaPipe Pose / Hands",
+      "vendor": "Google",
+      "license": { "model": "oss", "price": 0, "verify": false },
+      "compatibleWith": { "depthType": ["none", "passive-stereo", "active-stereo", "tof"] },
+      "providesTargets": ["limbs", "hands"],
+      "maxTrackedBodies": 1,
+      "addedLatencyMs": 25,
+      "computeNeed": "GPU推奨だがモバイルでも動く軽量。多人数は別途",
+      "confidence": { "providesTargets": "high (2.5D)", "maxTrackedBodies": "high (Pose は基本単一人物)", "addedLatencyMs": "med" },
+      "notes": "RGBで動く軽量姿勢/手推定。深度なしハードに limbs/hands を与える。**基本は単一人物**(複数人は検出器を別途重ねる)。手モデルで指関節も出るが3D精度は限定的。"
+    },
+    {
+      "id": "rtmpose-multi",
+      "name": "RTMPose / YOLO-Pose (多人数)",
+      "vendor": "OSS (MMPose / Ultralytics)",
+      "license": { "model": "oss", "price": 0, "verify": false },
+      "compatibleWith": { "depthType": ["none", "passive-stereo", "active-stereo", "tof"] },
+      "providesTargets": ["presence", "limbs"],
+      "maxTrackedBodies": 12,
+      "addedLatencyMs": 45,
+      "computeNeed": "NVIDIA GPU 必須。人数とモデルサイズでレイテンシ増",
+      "confidence": { "providesTargets": "med (2D、深度なしで奥行不定)", "maxTrackedBodies": "med (GPU性能依存)", "addedLatencyMs": "low (実装/モデルで大きく変動)" },
+      "notes": "RGB多人数2D姿勢。群衆の存在/おおまかな手足向き。**2Dなので奥行・正確な3D位置は出ない**(深度ハードと組むと改善)。最安ハード＋多人数案のアンカーになりうる。"
+    },
+    {
+      "id": "zed-body-tracking",
+      "name": "ZED Body Tracking",
+      "vendor": "Stereolabs",
+      "license": { "model": "bundled", "price": 0, "verify": false },
+      "compatibleWith": { "depthType": ["passive-stereo"], "equipmentIds": ["zed-2i"] },
+      "providesTargets": ["presence", "fullBody", "limbs"],
+      "maxTrackedBodies": 8,
+      "addedLatencyMs": 25,
+      "computeNeed": "NVIDIA GPU 必須 (ZED SDK)",
+      "confidence": { "providesTargets": "high", "maxTrackedBodies": "med", "addedLatencyMs": "med" },
+      "notes": "ZED 固定ペア。パッシブステレオの3D骨格で屋外可。指は不可(limbsまで)。"
+    },
+    {
+      "id": "ultraleap-hand-tracking",
+      "name": "Ultraleap Hand Tracking (Gemini)",
+      "vendor": "Ultraleap",
+      "license": { "model": "bundled", "price": 0, "verify": false },
+      "compatibleWith": { "depthType": ["active-stereo"], "equipmentIds": ["ultraleap-lmc2"] },
+      "providesTargets": ["hands", "fingers"],
+      "maxTrackedBodies": 2,
+      "addedLatencyMs": 10,
+      "computeNeed": "通常PC(GPU不要)",
+      "confidence": { "providesTargets": "high (指関節まで)", "maxTrackedBodies": "high (手2-4本)", "addedLatencyMs": "high" },
+      "notes": "Leap 固定ペア。**指先・指関節の高精度**。近接専用なので空間体験には不適、卓上/キオスクの hands/fingers 要件に最適。"
+    },
+    {
+      "id": "optitrack-motive",
+      "name": "OptiTrack Motive",
+      "vendor": "NaturalPoint",
+      "license": { "model": "commercial", "price": 300000, "verify": true },
+      "compatibleWith": { "depthType": ["none"], "equipmentIds": ["optitrack-primex-22"] },
+      "providesTargets": ["presence", "fullBody", "limbs", "fingers"],
+      "maxTrackedBodies": 10,
+      "addedLatencyMs": 4,
+      "computeNeed": "専用PC。多カメラ同期",
+      "confidence": { "providesTargets": "high (マーカー次第で指まで)", "maxTrackedBodies": "med (マーカーセット数依存)", "addedLatencyMs": "high (サブms〜数ms)" },
+      "notes": "OptiTrack 固定ペア。**マーカー装着前提**でwalk-up不可だが、サブmm精度・超低レイテンシ・指まで。価格はライセンス概算。"
+    },
+    {
+      "id": "lidar-pointcloud-person",
+      "name": "点群人検出 (自前/サードパーティ)",
+      "vendor": "カスタム",
+      "license": { "model": "oss", "price": 0, "verify": true },
+      "compatibleWith": { "depthType": ["lidar"] },
+      "providesTargets": ["presence", "fullBody"],
+      "maxTrackedBodies": 20,
+      "addedLatencyMs": 30,
+      "computeNeed": "点群処理PC。骨格はせず位置/存在/粗い姿勢",
+      "confidence": { "providesTargets": "low (presence/位置/fullBody粗)", "maxTrackedBodies": "low (アルゴリズム依存)", "addedLatencyMs": "low (実装依存)" },
+      "notes": "LiDAR点群からの人位置・存在検出。**骨格や手は出ない**。大空間の多人数位置トラッキング向き。実装は自前/サードパーティで質に幅。"
+    },
+
+    {
+      "id": "whisper-local",
+      "name": "Whisper (ローカル音声認識)",
+      "vendor": "OpenAI (OSS)",
+      "license": { "model": "oss", "price": 0, "verify": false },
+      "compatibleWith": { "sensingMethod": ["acoustic-mic"] },
+      "providesTargets": ["voiceCommand"],
+      "maxTrackedBodies": 1,
+      "addedLatencyMs": 600,
+      "computeNeed": "GPU推奨(中〜大モデル)。リアルタイムは要工夫",
+      "confidence": { "providesTargets": "high (高精度・多言語)", "addedLatencyMs": "low (モデル/ストリーミング実装で大きく変動)" },
+      "notes": "**高精度・多言語・オフライン**だが、自由発話の文起こし用でレイテンシが大きい。即応のコマンド体験には不向き、発話→反応に間が許される用途向け。1発話単位(同時複数話者は分離前提)。"
+    },
+    {
+      "id": "picovoice-wakeword",
+      "name": "Picovoice (ウェイクワード/コマンド)",
+      "vendor": "Picovoice",
+      "license": { "model": "commercial", "price": 0, "verify": true },
+      "compatibleWith": { "sensingMethod": ["acoustic-mic"] },
+      "providesTargets": ["voiceCommand"],
+      "maxTrackedBodies": 1,
+      "addedLatencyMs": 50,
+      "computeNeed": "エッジ/マイコンでも動く軽量",
+      "confidence": { "providesTargets": "med (定型コマンド/語彙限定)", "addedLatencyMs": "high (オンデバイス低遅延)" },
+      "notes": "**低遅延・オフラインの定型コマンド/ウェイクワード**検出。自由発話は不可で語彙を事前定義。即応のジェスチャー的音声トリガーに最適。商用は規模で課金(価格要検証)。"
+    },
+    {
+      "id": "vosk-offline",
+      "name": "Vosk (オフライン音声認識)",
+      "vendor": "Alpha Cephei (OSS)",
+      "license": { "model": "oss", "price": 0, "verify": false },
+      "compatibleWith": { "sensingMethod": ["acoustic-mic"] },
+      "providesTargets": ["voiceCommand"],
+      "maxTrackedBodies": 1,
+      "addedLatencyMs": 200,
+      "computeNeed": "CPUで動く軽量〜中量",
+      "confidence": { "providesTargets": "med", "addedLatencyMs": "med" },
+      "notes": "オフライン・軽量のストリーミング音声認識。Whisper より低精度だが低遅延・CPU可。中庸のコマンド/短文用途。"
+    },
+    {
+      "id": "cloud-asr",
+      "name": "クラウド音声認識 (Google/Azure 等)",
+      "vendor": "各クラウド",
+      "license": { "model": "commercial", "price": 0, "verify": true },
+      "compatibleWith": { "sensingMethod": ["acoustic-mic"] },
+      "providesTargets": ["voiceCommand"],
+      "maxTrackedBodies": 1,
+      "addedLatencyMs": 400,
+      "computeNeed": "ネット接続必須。従量課金",
+      "confidence": { "providesTargets": "high", "addedLatencyMs": "low (回線品質依存)" },
+      "notes": "高精度・多言語だが**ネット必須＋従量課金＋通信レイテンシ**。会場のネット品質に成立が依存(オフライン会場では選べない)。常設で通信が安定する用途向け。"
+    }
+  ]
+}
