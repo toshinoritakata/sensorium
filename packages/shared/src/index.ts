@@ -1,3 +1,4 @@
+export * from './assert'
 export * from './feedback'
 export * from './modality'
 export * from './equipment'

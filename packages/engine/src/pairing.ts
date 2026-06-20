@@ -1,4 +1,4 @@
-import type { DetectionMethod, Equipment, InputModality } from '@feasisense/shared'
+import { assertNever, type DetectionMethod, type Equipment, type InputModality } from '@feasisense/shared'
 
 /** spatial 光学ハードウェア（depthType を持つ category:'spatial'）。 */
 export type SpatialEquipment = Extract<Equipment, { category: 'spatial' }>
@@ -23,6 +23,9 @@ export function producesModality(hw: SpatialEquipment): InputModality[] {
       return ['pointcloud']
     case 'none':
       return hw.sensingMethod.includes('marker-mocap') ? ['ir'] : ['rgb']
+    default:
+      // depthType を増やしたらここがコンパイルエラーになる（網羅性の番人）。
+      return assertNever(hw.depthType, 'depthType')
   }
 }
 
