@@ -14,9 +14,13 @@ function loadJson(relFromRepoRoot: string): unknown {
 }
 
 describe('seed validation — Zod が data/*.seed.json を受理する', () => {
-  it('equipment.seed.json（光学/センサー ハード 16点）', () => {
+  it('equipment.seed.json（光学/センサー ハード 16点＋LEDフロア）', () => {
     const parsed = EquipmentSeedFileSchema.parse(loadJson('data/equipment.seed.json'))
-    expect(parsed.equipment).toHaveLength(16)
+    expect(parsed.equipment).toHaveLength(17)
+    // LEDフロアは pressure-mat かつ floor-visual 出力を持つ。
+    const led = parsed.equipment.find((e) => e.id === 'interactive-led-floor')
+    expect(led?.category).toBe('pressure-mat')
+    expect(led?.providesFeedback).toContain('floor-visual')
   })
 
   it('industrial-sensors.seed.json（工業用センサー 9点）', () => {

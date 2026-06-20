@@ -2,17 +2,20 @@ import type {
   Condition,
   Equipment,
   EvaluateResult,
+  FeedbackKind,
   InteractionSpec,
+  Phenomenon,
   PressureMat,
   Setup,
 } from '@feasisense/shared'
 import { canDetect } from './sensed-targets'
 import { FLOOR_PACKING_EFFICIENCY, sensorLatencyAllowance } from './budgets'
 import {
-  areaCondition,
   budgetCondition,
   capacityCondition,
+  feedbackCondition,
   latencyCondition,
+  tiledFloorAreaCondition,
 } from './dimensions/index'
 
 /**
@@ -35,7 +38,7 @@ export function evaluate(spec: InteractionSpec, equipment: Equipment[]): Evaluat
   )
 
   const setups = candidates
-    .map((eq) => buildSetup(spec, primary.id, eq))
+    .map((eq) => buildSetup(spec, primary, eq))
     .filter((s): s is Setup => s !== null)
 
   const notes: string[] = []
@@ -50,11 +53,11 @@ export function evaluate(spec: InteractionSpec, equipment: Equipment[]): Evaluat
 
 function buildSetup(
   spec: InteractionSpec,
-  phenomenonId: string,
+  phenomenon: Phenomenon,
   eq: Equipment,
 ): Setup | null {
   if (eq.category === 'pressure-mat') {
-    return buildPressureMatSetup(spec, phenomenonId, eq)
+    return buildPressureMatSetup(spec, phenomenon, eq)
   }
   // 他カテゴリは後続スライス。
   return null
@@ -62,7 +65,7 @@ function buildSetup(
 
 function buildPressureMatSetup(
   spec: InteractionSpec,
-  phenomenonId: string,
+  phenomenon: Phenomenon,
   mat: PressureMat,
 ): Setup {
   const perMatArea = mat.area_m2 ?? (mat.dims_m ? mat.dims_m[0] * mat.dims_m[1] : 1.0)
@@ -75,24 +78,36 @@ function buildPressureMatSetup(
 
   const { comfortAllowanceMs, tolerableAllowanceMs } = sensorLatencyAllowance(spec)
 
-  // 感圧マットは1枚=1ゾーン。multi ゾーン品は将来 zones 数を envelope から取る。
-  const zones = count
+  // 独立して読めるゾーン数。single 配線は何枚並べても1論理ゾーン（踏み有無のみ）、
+  // multi はタイル毎にアドレス可（枚数＝ゾーン数）。
+  const addressableZones = mat.zones === 'multi' ? count : 1
+  const discrimination = phenomenon.discrimination ?? 'occupancy'
 
   const conditions: Condition[] = [
-    areaCondition(spec.context.area_m2, coverable),
-    capacityCondition(spec.context.simultaneousUsers, zones),
+    tiledFloorAreaCondition(spec.context.area_m2, coverable, count),
+    capacityCondition(spec.context.simultaneousUsers, addressableZones, discrimination),
     latencyCondition(mat.responseTimeMs, comfortAllowanceMs, tolerableAllowanceMs),
     budgetCondition(totalCostJPY, spec.context.budgetJPY),
   ]
+
+  // フィードバック（出力）軸: 床演出などを Setup の機材が満たすか。
+  const requiredFeedback: FeedbackKind[] = (spec.feedback ?? []).map((f) => f.kind)
+  const providedFeedback = new Set<FeedbackKind>(mat.providesFeedback ?? [])
+  const fb = feedbackCondition(requiredFeedback, providedFeedback)
+  if (fb) conditions.push(fb)
+
+  const paretoLabels = mat.providesFeedback?.includes('floor-visual')
+    ? ['床演出一体', '最堅牢']
+    : ['最堅牢', 'オクルージョン無縁']
 
   return {
     id: `setup-${mat.id}`,
     label: `${mat.name} ×${count}`,
     anchorEquipmentId: mat.id,
-    channels: [{ phenomenonId, equipmentIds: [mat.id], count }],
+    channels: [{ phenomenonId: phenomenon.id, equipmentIds: [mat.id], count }],
     conditions,
     totalCostJPY,
-    paretoLabels: ['最堅牢', 'オクルージョン無縁'],
+    paretoLabels,
     mountPlan: {
       equipmentId: mat.id,
       count,

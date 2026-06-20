@@ -1,4 +1,9 @@
-import type { Condition, ConditionStatus } from '@feasisense/shared'
+import type {
+  Condition,
+  ConditionStatus,
+  Discrimination,
+  FeedbackKind,
+} from '@feasisense/shared'
 
 /**
  * 連続値の utilization → status。閾値は data/dimensions.seed.json 準拠。
@@ -15,7 +20,10 @@ export function round(n: number, digits = 3): number {
   return Math.round(n * f) / f
 }
 
-/** area 次元: required / maxCoverable。ok<0.85 / warn 0.85–1.0 / fail>1.0。 */
+/**
+ * area 次元（カメラ等の固定FOV系）: required / maxCoverable。ok<0.85 / warn 0.85–1.0 / fail>1.0。
+ * 床射影は遠近で端が欠けるため 15% の余裕代を取る。
+ */
 export function areaCondition(requiredM2: number, coverableM2: number): Condition {
   const util = requiredM2 / coverableM2
   return {
@@ -30,17 +38,62 @@ export function areaCondition(requiredM2: number, coverableM2: number): Conditio
   }
 }
 
-/** capacity 次元: users / 検出ゾーン数。ok<0.8 / warn 0.8–1.0 / fail>1.0。 */
-export function capacityCondition(users: number, zones: number): Condition {
+/**
+ * area 次元（タイル敷設系: 感圧マット/LEDフロア/ライトカーテン）。
+ * 敷いた所がそのまま検出域で、端ロスは充填効率に織り込み済み。枚数で必ず充足できるため
+ * 面積はリスクでなくコスト要因（律速は予算）。常に ok とし、枚数とカバー面積を残す。
+ */
+export function tiledFloorAreaCondition(
+  requiredM2: number,
+  coverableM2: number,
+  count: number,
+): Condition {
+  return {
+    dimension: 'area',
+    status: 'ok',
+    currentValue: round(coverableM2, 2),
+    threshold: requiredM2,
+    operator: 'coverable ≥ required',
+    rationale: `${count} 枚で必要 ${requiredM2}m² をカバー（実効 ${round(coverableM2, 2)}m²）。タイル系は枚数で必ず充足でき、律速は予算側に移る。`,
+    derivedFrom: 'spec.context.area_m2, タイル枚数×実効面積',
+    severity: 'info',
+  }
+}
+
+/**
+ * capacity 次元: 空間弁別の要求度で意味が変わる。
+ * occupancy=人数非依存（トリガーのみ）/ zoned・per-user=独立ゾーンが人数分要る。
+ * ok<0.8 / warn 0.8–1.0 / fail>1.0。
+ */
+export function capacityCondition(
+  users: number,
+  zones: number,
+  discrimination: Discrimination,
+): Condition {
+  if (discrimination === 'occupancy') {
+    return {
+      dimension: 'capacity',
+      status: 'ok',
+      currentValue: users,
+      rationale: `踏み有無のトリガー検出（occupancy）は同時人数に依存しない。${users} 人でも『誰かが踏んだ』を返せる。`,
+      derivedFrom: 'phenomenon.discrimination=occupancy',
+      severity: 'info',
+    }
+  }
   const util = users / zones
+  const label = discrimination === 'per-user' ? '個人弁別' : 'ゾーン弁別'
+  const note =
+    zones <= 1
+      ? `単一ゾーン出力では位置を弁別できない（独立ゾーン ${zones}）。アドレス可能な機材が要る。`
+      : `独立ゾーン ${zones} に対し同時 ${users} 人。出入りで瞬間的に超過しやすく 80% 超で警告。`
   return {
     dimension: 'capacity',
     status: utilizationStatus(util, 0.8),
     currentValue: round(util),
     threshold: 0.8,
     operator: 'utilization <',
-    rationale: `同時 ${users} 人 / 検出ゾーン ${zones} = 充足率 ${round(util)}。出入りで瞬間的に超過しやすく 80% 超で警告。`,
-    derivedFrom: 'spec.context.simultaneousUsers, 機材ゾーン数',
+    rationale: `${label}（${discrimination}）に充足率 ${round(util)}。${note}`,
+    derivedFrom: 'spec.context.simultaneousUsers, 独立ゾーン数, phenomenon.discrimination',
     severity: 'soft',
   }
 }
@@ -65,6 +118,31 @@ export function latencyCondition(
     operator: 'responseTimeMs ≤',
     rationale: `応答 ${responseTimeMs}ms vs sensor+detect 予算 ${comfortAllowanceMs}ms（快適）/ ${tolerableAllowanceMs}ms（許容）。工業用センサーは推論加算なしで低遅延が強み。`,
     derivedFrom: '機材 responseTimeMs, responsivenessBudget',
+    severity: 'hard',
+  }
+}
+
+/**
+ * feedback 次元: 必要な出力を Setup の機材が一体で満たすか。
+ * 要求なしなら null（条件を出さない）。満たさない出力があれば fail
+ * （床演出は別系統=投影等が要り、この案単体では成立しない）。
+ */
+export function feedbackCondition(
+  required: readonly FeedbackKind[],
+  provided: ReadonlySet<FeedbackKind>,
+): Condition | null {
+  if (required.length === 0) return null
+  const missing = required.filter((k) => !provided.has(k))
+  const status: ConditionStatus = missing.length > 0 ? 'fail' : 'ok'
+  const rationale =
+    missing.length > 0
+      ? `必要な出力 [${required.join(', ')}] のうち [${missing.join(', ')}] をこの案の機材が出せない。床演出には別系統（投影等）が要る。`
+      : `必要な出力 [${required.join(', ')}] を機材が一体で提供。`
+  return {
+    dimension: 'feedback',
+    status,
+    rationale,
+    derivedFrom: 'spec.feedback, 機材.providesFeedback',
     severity: 'hard',
   }
 }

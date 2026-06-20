@@ -1,3 +1,4 @@
+export * from './feedback'
 export * from './equipment'
 export * from './detection'
 export * from './dimensions'

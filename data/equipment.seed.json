@@ -357,6 +357,30 @@
       "mountingNeed": "ラック/卓上",
       "confidence": { "powerW": "low" },
       "notes": "XLRマイク(ショットガン/バウンダリー)の interface role を埋め、**ファンタム48Vを供給**。USBマイクアレイには不要。複数マイクで共有可(共有 role は budget 1回計上)。"
+    },
+    {
+      "id": "interactive-led-floor",
+      "name": "インタラクティブLEDフロア (感圧+LED一体タイル)",
+      "vendor": "汎用",
+      "rolesProvided": ["sense"],
+      "sensingMethod": ["pressure"],
+      "servesModality": ["touch", "gesture"],
+      "category": "pressure-mat",
+      "status": "active",
+      "providesFeedback": ["floor-visual"],
+      "source": { "adapter": "manual", "sourceUrl": "https://www.example.com/interactive-led-floor", "verify": true },
+      "price": { "value": 120000, "currency": "JPY", "asOf": "2026-01", "verify": true },
+      "interface": { "type": "ethernet", "spec": "タイルコントローラ間デイジーチェーン (DMX/network)", "connector": "専用/RJ45", "maxCableLength_m": 50, "power": "external-dc" },
+      "powerW": 40,
+      "computeNeed": "コンテンツ再生PC＋タイルコントローラ",
+      "mountingNeed": "床に敷設、給電・データ配線。耐荷重・段差処理",
+      "area_m2": 1.0,
+      "triggerForce_kg": 20,
+      "zones": "multi",
+      "responseTimeMs": 30,
+      "output": "serial/DMX/network",
+      "confidence": { "area_m2": "med (1タイル≈0.5〜1m角)", "triggerForce_kg": "low", "responseTimeMs": "med", "price": "low (面積で大きく変動)" },
+      "notes": "**踏み検知とLED表示が一体**。床そのものが光る演出（floor-visual）が要る体験に最適。感圧マットより高価・要電源・要コンテンツ制作。価格は1m²あたり概算で要検証。"
     }
   ]
 }

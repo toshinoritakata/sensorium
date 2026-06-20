@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { FeedbackKind } from './feedback'
 
 /**
  * InteractionSpec — 体験の構造化構想。エンジンの入力（唯一の真実 = フォーム）。
@@ -10,15 +11,36 @@ export const Lighting = z.enum(['controlled', 'mixed', 'bright', 'dark', 'outdoo
 export const AmbientNoise = z.enum(['quiet', 'moderate', 'loud'])
 export const Provenance = z.enum(['stated', 'inferred', 'assumed'])
 
+/**
+ * 空間弁別の要求度。capacity 次元の意味を決める。
+ * - occupancy: 「誰か/何かが居る・踏んだ」のトリガーのみ（人数に依存しない）
+ * - zoned: どのゾーンか（局所応答が要る＝独立ゾーンが人数分要る）
+ * - per-user: 個人を継続追跡・識別する
+ */
+export const Discrimination = z.enum(['occupancy', 'zoned', 'per-user'])
+export type Discrimination = z.infer<typeof Discrimination>
+
 /** 検出すべき現象（SensedPhenomenon）。sensedTarget で必要解像を指す。 */
 export const PhenomenonSchema = z.object({
   id: z.string(),
   sensedTarget: z.string(),
   label: z.string().optional(),
+  /** 空間弁別の要求度（未指定なら occupancy = トリガーのみ）。 */
+  discrimination: Discrimination.optional(),
   provenance: Provenance.optional(),
 })
 
 export type Phenomenon = z.infer<typeof PhenomenonSchema>
+
+/** 体験が必要とする出力（床が光る等）。検出と別軸。 */
+export const FeedbackNeedSchema = z.object({
+  id: z.string(),
+  kind: FeedbackKind,
+  label: z.string().optional(),
+  provenance: Provenance.optional(),
+})
+
+export type FeedbackNeed = z.infer<typeof FeedbackNeedSchema>
 
 export const InteractionSpecSchema = z.object({
   id: z.string(),
@@ -33,6 +55,8 @@ export const InteractionSpecSchema = z.object({
     usageModel: z.string().optional(),
   }),
   phenomena: z.array(PhenomenonSchema).min(1),
+  /** 必要な出力。未指定なら検出のみ評価。 */
+  feedback: z.array(FeedbackNeedSchema).optional(),
 })
 
 export type InteractionSpec = z.infer<typeof InteractionSpecSchema>

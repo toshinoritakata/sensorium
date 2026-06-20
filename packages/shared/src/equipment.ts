@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { FeedbackKind } from './feedback'
 
 /**
  * Equipment スキーマ（data/equipment.schema.md の写像）。
@@ -47,6 +48,8 @@ const equipmentBase = {
   rolesProvided: z.array(Role),
   sensingMethod: z.array(z.string()),
   servesModality: z.array(Modality),
+  /** この機材が一体で提供する出力（無ければ検出専用）。 */
+  providesFeedback: z.array(FeedbackKind).optional(),
   price: PriceSchema,
   interface: InterfaceSchema,
   powerW: z.number(),

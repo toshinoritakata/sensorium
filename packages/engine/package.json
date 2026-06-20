@@ -5,7 +5,8 @@
   "type": "module",
   "main": "./src/index.ts",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./load-seeds": "./src/load-seeds.ts"
   },
   "dependencies": {
     "@feasisense/shared": "workspace:*"
