@@ -14,6 +14,18 @@
 pnpm install
 pnpm test        # vitest（seed 検証 ＋ engine ゴールデンテスト）
 pnpm typecheck   # tsc --noEmit
+pnpm eval        # 固定シナリオで入力→機材案を一覧表示
+```
+
+### 評価 CLI
+
+任意の構想をコマンドラインから検証する。
+
+```sh
+pnpm cli -- -p hands --users 1 --responsiveness tight --lighting dark --budget 300000 --frontier
+pnpm cli -- -p step --area 20 --users 6 --budget 1500000 --discrimination zoned
+pnpm cli -- --help     # 全オプション
+pnpm cli -- -p hands --json   # 生の Result を JSON 出力
 ```
 
 ## 現状の縦切り

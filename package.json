@@ -6,6 +6,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "eval": "tsx scripts/evaluate-demo.ts",
+    "cli": "tsx scripts/cli.ts",
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "devDependencies": {
