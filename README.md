@@ -28,6 +28,16 @@ pnpm cli -- --help     # 全オプション
 pnpm cli -- -p hands --json   # 生の Result を JSON 出力
 ```
 
+### 自然言語入口（pnpm ask）
+
+自由文を渡すと Claude が InteractionSpec を構造抽出し、そのまま評価する（論点Cの入口）。
+要 `ANTHROPIC_API_KEY`。Claude は現象・面積・制約まで抽出し、機材選定はしない（エンジン専任）。
+
+```sh
+pnpm ask "踏むと光る床、直径10mの円形、20人くらい乗る"
+pnpm ask "暗い会場で手を振ると反応、キオスク、予算20万"
+```
+
 ## 現状の縦切り
 
 「踏んだら反応する床」（step 現象 → 感圧マット）が通る最小パイプライン。
