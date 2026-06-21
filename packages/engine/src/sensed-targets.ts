@@ -12,6 +12,8 @@ const CATEGORY_TARGETS: Partial<Record<EquipmentCategory, readonly string[]>> = 
   'pressure-mat': ['step', 'weight'],
   'motion-pir': ['motion', 'presence'],
   'radar-presence': ['presence', 'distance1d', 'gesture', 'count'],
+  // 2D LiDAR は面内座標が取れるので、破断のみの area-curtain より広く拾える。
+  'lidar-2d': ['zoneCrossing', 'presence', 'objectPresence', 'count'],
 }
 
 /** この機材が（単体で）直接出せる sensedTarget の集合。 */

@@ -95,6 +95,7 @@
 | `presence-point` | `detectMode`(through-beam/retroreflective/diffuse/inductive/capacitive), `sensingDistance_m`, `minTargetSize_mm`, `responseTimeMs`, `output`(PNP/NPN/IO-Link/relay/analog) | objectPresence / zoneCrossing |
 | `distance-1d` | `measureRange_m`[min,max], `beamAngle_deg`, `resolution_mm`, `responseTimeMs`, `output` | distance1d |
 | `area-curtain` | `coverageW_m`, `coverageH_m`, `beamPitch_mm`(ゾーン分解能), `minDetectObject_mm`, `responseTimeMs`, `output` | zoneCrossing（平面内位置・粗いタッチレス） |
+| `lidar-2d` | `range_m`, `scanAngle_deg`, `angularResolution_deg`, `scanRateHz`, `minDetectObject_mm`, `accuracy_mm`, `responseTimeMs`, `output` | zoneCrossing / presence / objectPresence / count（面を放射状に走査し面内座標を取る。破断有無だけの area-curtain と別物） |
 | `pressure-mat` | `area_m2` or `dims_m`, `triggerForce_kg`, `zones`(single/multi), `responseTimeMs`, `output` | step / weight |
 | `motion-pir` | `detectionRange_m`, `detectionAngle_deg`, `holdTimeMs`, `output` | motion / presence |
 | `radar-presence` | `range_m`, `fov_deg`, `capabilities`[presence/distance/coarse-gesture/count], `responseTimeMs`, `output` | presence / distance1d / gesture(粗) / count |

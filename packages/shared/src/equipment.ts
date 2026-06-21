@@ -134,6 +134,20 @@ export const AreaCurtainEquipment = base.extend({
   output: z.string(),
 })
 
+/** 2D スキャニング LiDAR（平面を放射状に走査して面内の位置・通過・人数を取る）。
+ *  ライトカーテン(area-curtain)は「破断の有無」だけだが、こちらは面内座標が取れる別物。 */
+export const Lidar2dEquipment = base.extend({
+  category: z.literal('lidar-2d'),
+  range_m: z.number(),
+  scanAngle_deg: z.number(),
+  angularResolution_deg: z.number(),
+  scanRateHz: z.number(),
+  minDetectObject_mm: z.number(),
+  accuracy_mm: z.number(),
+  responseTimeMs: z.number(),
+  output: z.string(),
+})
+
 export const PressureMatEquipment = base.extend({
   category: z.literal('pressure-mat'),
   area_m2: z.number().optional(),
@@ -169,6 +183,7 @@ export const EquipmentSchema = z.discriminatedUnion('category', [
   PresencePointEquipment,
   Distance1dEquipment,
   AreaCurtainEquipment,
+  Lidar2dEquipment,
   PressureMatEquipment,
   MotionPirEquipment,
   RadarPresenceEquipment,

@@ -23,7 +23,7 @@ _Avoid_: 信頼度, confidence
 _Avoid_: デバイス, 機器
 
 **工業用センサークラス**:
-工業用センサー系 Equipment のカテゴリ群と、それが担う sensedTarget。`presence-point`(フォト/近接→objectPresence・zoneCrossing) / `distance-1d`(超音波・レーザー測距→distance1d) / `area-curtain`(ライトカーテン→平面内 zoneCrossing) / `pressure-mat`(感圧・ロードセル→step・weight) / `motion-pir`(PIR→motion・presence) / `radar-presence`(mmWave→presence・distance1d・粗い gesture・count)。InteractionSpec の sensedTargets はこれらに対応して `objectPresence / zoneCrossing / distance1d / step / weight / motion / count` を含む。これらは骨格系(`fullBody`/`hands`/`fingers`)とは別系統で並列に扱う。
+工業用センサー系 Equipment のカテゴリ群と、それが担う sensedTarget。`presence-point`(フォト/近接→objectPresence・zoneCrossing) / `distance-1d`(超音波・レーザー測距→distance1d) / `area-curtain`(ライトカーテン→平面内 zoneCrossing) / `lidar-2d`(2Dスキャニング LiDAR→面内座標で zoneCrossing・presence・objectPresence・count。破断有無だけの area-curtain と別系統) / `pressure-mat`(感圧・ロードセル→step・weight) / `motion-pir`(PIR→motion・presence) / `radar-presence`(mmWave→presence・distance1d・粗い gesture・count)。InteractionSpec の sensedTargets はこれらに対応して `objectPresence / zoneCrossing / distance1d / step / weight / motion / count` を含む。これらは骨格系(`fullBody`/`hands`/`fingers`)とは別系統で並列に扱う。
 
 **IngestionSource（取込ソース）**:
 機材データを外部から取り込む経路。3アダプタに統一: ①`api-distributor`（DigiKey 主・Mouser 補。OAuth・パラメトリック。Omron 等メーカーも供給元として横断取得）②`flat-file`（CSV／Misumi・RS フラットファイル・手入力）③`url-extract`（任意の製品URLを fetch → Claude が仕様抽出）。3口とも出口は共通パイプライン「候補 → レビュー → 有効」。マッピング（カタログのバラバラな項目 → 自社 envelope）は **Claude 抽出＋人レビュー**（provenance の流儀と一致）。**法務: 出典付き・on-demand・非ミラー**。各API の User Agreement を実装前に確認する。
