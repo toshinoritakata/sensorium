@@ -3,3 +3,8 @@ dist/
 *.tsbuildinfo
 .DS_Store
 coverage/
+
+# 環境変数・秘匿情報（API キー等）。誤コミット防止のため除外。
+.env
+.env.*
+!.env.example
