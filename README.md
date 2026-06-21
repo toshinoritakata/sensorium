@@ -40,6 +40,11 @@ pnpm ask "暗い会場で手を振ると反応、キオスク、予算20万"
 
 ## 現状の縦切り
 
-「踏んだら反応する床」（step 現象 → 感圧マット）が通る最小パイプライン。
-成立ゲート → 必要枚数のタイル化 → area/capacity/latency/budget の Condition 算出まで。
-spatial（カメラ＋DetectionMethod）、Pareto 順位付け、MountPlan 幾何、Claude proxy は後続。
+通っているパイプライン:
+
+- **step（感圧マット）** — 成立ゲート → 必要枚数のタイル化 → area/capacity/latency/budget の Condition → MountPlan 幾何（タイル敷設）まで全通し。
+- **spatial（カメラ × DetectionMethod）** — ハード×検出ソフトの互換ペアを合成し、解像・metrics・Condition を算出して候補化。
+- **Pareto フロンティア** — 5 軸の被支配案を消去する順位付け（CLI `--frontier`）。
+- **Claude 自然言語入口** — 自由文 → InteractionSpec の構造抽出（`pnpm ask`）。
+
+後続: spatial の MountPlan 幾何（カメラ被覆 / FOV）、audio・touch の DetectionMethod 経路。

@@ -34,9 +34,12 @@ import {
 } from './dimensions/index'
 
 /**
- * 成立ゲート → Setup 組み立ての縦切り（論点B 段1＋段2の最小実装）。
- * 現状は主 Channel = 先頭現象、候補は工業用センサーの直接検出のみ。
- * pressure-mat（step/weight 現象）を実装。spatial/Pareto/MountPlan幾何は後続。
+ * 成立ゲート → Setup 組み立ての縦切り（論点B 段1＋段2）。
+ * 主 Channel は先頭の現象。候補は二経路で集める:
+ *   経路1 = 工業用センサーの直接検出（感圧マット等）、
+ *   経路2 = spatial ハード × DetectionMethod のペア合成（骨格/身体系）。
+ * 集めた候補は Pareto で被支配を注記する。
+ * 後続: spatial の MountPlan 幾何（カメラ被覆 / FOV）、audio・touch の検出経路。
  */
 export function evaluate(
   spec: InteractionSpec,
@@ -45,7 +48,7 @@ export function evaluate(
 ): EvaluateResult {
   const primary = spec.phenomena[0]
   if (primary === undefined) {
-    return { primaryPhenomenonId: '', setups: [], notes: ['phenomena が空です'] }
+    return { primaryPhenomenonId: '', setups: [], notes: ['現象が一つも指定されていません'] }
   }
 
   const notes: string[] = []
