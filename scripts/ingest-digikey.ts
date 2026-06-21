@@ -92,7 +92,8 @@ async function getToken(): Promise<string> {
   if (!id || !secret) {
     console.error(
       'DIGIKEY_CLIENT_ID / DIGIKEY_CLIENT_SECRET が未設定です。\n' +
-        'developer.digikey.com でアプリ登録し、Product Information API のキーを発行してください。\n' +
+        'developer.digikey.com でアプリ登録し、Product Information API のキーを発行のうえ\n' +
+        '.env に設定してください（cp .env.example .env して埋める。.env はコミットされません）。\n' +
         '（認証なしで写像だけ試すには --fixture <生製品JSON> を使えます）',
     )
     process.exit(1)

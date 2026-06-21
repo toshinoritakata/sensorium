@@ -50,7 +50,8 @@ pnpm ingest:digikey "PIR motion sensor" --out data/candidates.ingest.json
 pnpm ingest:digikey --fixture <生製品JSON>   # DigiKey 認証なしで写像だけ検証
 ```
 
-要 `ANTHROPIC_API_KEY` ＋ DigiKey の OAuth キー（環境変数）:
+要 `ANTHROPIC_API_KEY`（`.zshrc`）＋ DigiKey の OAuth キー。DigiKey キーは `.env` に置く
+（`cp .env.example .env` して埋める。`.env` は gitignore 済み。`pnpm ingest:digikey` が自動読込）:
 
 | 変数 | 既定 | 用途 |
 | --- | --- | --- |
