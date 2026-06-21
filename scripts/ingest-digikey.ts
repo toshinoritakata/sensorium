@@ -1,51 +1,13 @@
-import { readFileSync, writeFileSync, existsSync } from 'node:fs'
+import { readFileSync } from 'node:fs'
 import Anthropic from '@anthropic-ai/sdk'
-import { zodOutputFormat } from '@anthropic-ai/sdk/helpers/zod'
-import { z } from 'zod'
-import {
-  EquipmentSchema,
-  EquipmentSeedFileSchema,
-  SpatialEquipment,
-  TouchEquipment,
-  AudioEquipment,
-  SupportEquipment,
-  PresencePointEquipment,
-  Distance1dEquipment,
-  AreaCurtainEquipment,
-  PressureMatEquipment,
-  MotionPirEquipment,
-  RadarPresenceEquipment,
-  type Equipment,
-} from '@sensorium/shared'
+import { type Equipment } from '@sensorium/shared'
+import { mapEquipment, mergeWrite, pick, slug } from './ingest-lib'
 
 /**
- * カテゴリ → そのカテゴリのメンバースキーマ。EquipmentSchema(判別ユニオン)は structured output が
- * 受けない（anyOf+$defs 非対応）ため、(1)カテゴリ選択 →(2)単一メンバーで写像、の二段にする。
- * 二重定義は持たない: ここで使うのもユニオンを構成する同一スキーマそのもの。
- */
-const CATEGORY_SCHEMAS = {
-  spatial: SpatialEquipment,
-  touch: TouchEquipment,
-  audio: AudioEquipment,
-  support: SupportEquipment,
-  'presence-point': PresencePointEquipment,
-  'distance-1d': Distance1dEquipment,
-  'area-curtain': AreaCurtainEquipment,
-  'pressure-mat': PressureMatEquipment,
-  'motion-pir': MotionPirEquipment,
-  'radar-presence': RadarPresenceEquipment,
-} as const
-type Category = keyof typeof CATEGORY_SCHEMAS
-const CATEGORIES = Object.keys(CATEGORY_SCHEMAS) as [Category, ...Category[]]
-const CategoryPick = z.object({
-  category: z.enum(CATEGORIES).describe('この製品をインタラクティブ展示で使う観点で最も近いカテゴリ'),
-})
-
-/**
- * 取込アダプタ `api-distributor`（DigiKey 主）の最小実装（ADR-0002）。
+ * 取込アダプタ `api-distributor`（DigiKey 主）の実装（ADR-0002）。
  *   pnpm ingest:digikey "<キーワード>" [--limit N] [--out data/candidates.ingest.json]
  *
- * 流れ: OAuth2(client_credentials) → キーワード検索 → 生カタログを Claude が envelope へ写像
+ * 流れ: OAuth2(client_credentials) → キーワード検索 → 生カタログを Claude が envelope へ写像（ingest-lib）
  *       → status:'candidate' で候補ファイルへ追記。エンジンは active のみ読むので、ここで取り込んでも
  *       人レビューで昇格するまで成立判定には入らない（候補ゲート）。
  *
@@ -132,16 +94,7 @@ async function searchKeyword(token: string): Promise<unknown[]> {
   return (json.Products ?? []).slice(0, limit)
 }
 
-// --- 生製品から出典に使う事実を取り出す（スキーマ揺れに強いよう緩く拾う） -------
-function pick(obj: unknown, ...keys: string[]): unknown {
-  let cur: unknown = obj
-  for (const k of keys) {
-    if (cur && typeof cur === 'object' && k in (cur as Record<string, unknown>)) {
-      cur = (cur as Record<string, unknown>)[k]
-    } else return undefined
-  }
-  return cur
-}
+/** 生製品から出典に使う事実を取り出す（v4 のフィールドパス）。 */
 function sourceFacts(product: unknown) {
   const mfr = String(pick(product, 'Manufacturer', 'Name') ?? pick(product, 'Manufacturer') ?? '')
   const partNo = String(pick(product, 'ManufacturerProductNumber') ?? pick(product, 'ManufacturerPartNumber') ?? '')
@@ -149,75 +102,9 @@ function sourceFacts(product: unknown) {
   const unitPrice = Number(pick(product, 'UnitPrice') ?? 0)
   return { mfr, partNo, url, unitPrice }
 }
-function slug(...parts: string[]): string {
-  return parts.join('-').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
-}
 
-// --- Claude 写像 ----------------------------------------------------------
-const SYSTEM = `あなたは Sensorium の機材取込アダプタです。ディストリビュータ(DigiKey)の生の製品データ1件を、
-Sensorium の Equipment envelope へ写像します。
-- category は実体に最も近いものを10種から選ぶ: spatial / touch / audio / support / presence-point /
-  distance-1d / area-curtain / pressure-mat / motion-pir / radar-presence。インタラクティブ展示で
-  「人/物の検出」に使えないただの部品（抵抗・コネクタ等）は support にする。
-- envelope の各数値は製品 Parameters から読み取る。読み取れない/自信が無い値は、そのクラスで妥当な代表値を
-  入れた上で confidence にフィールド名→"low (推定)" を記し、price.verify=true 相当の扱いにする。
-- rolesProvided は通常 ['sense']。sensingMethod は検出原理（ir-active/ultrasonic/radar/capacitive/pressure 等）。
-- servesModality は既存3軸 touch/gesture/voice に寄せる（近接・存在系は touch）。
-- 価格・id・source は呼び出し側が後で権威的に上書きするので、ここでは仮値でよい（price.value=0 でも可）。
-- 出力は必ず指定スキーマに完全準拠した1件の Equipment。欠かさず全必須フィールドを埋める。`
-
-const client = new Anthropic()
-
-async function mapToEquipment(product: unknown): Promise<Equipment | null> {
-  const facts = sourceFacts(product)
-  const userContent = `製品名: ${facts.mfr} ${facts.partNo}\n生データ:\n${JSON.stringify(product, null, 2)}`
-
-  // (1) カテゴリ選択。
-  const pick = await client.messages.parse({
-    model: 'claude-haiku-4-5', // 分類は軽量タスク。
-    max_tokens: 512,
-    system: SYSTEM,
-    messages: [{ role: 'user', content: `${userContent}\n\nこの製品のカテゴリだけを選んでください。` }],
-    output_config: { format: zodOutputFormat(CategoryPick) },
-  })
-  const category = pick.parsed_output?.category
-  if (!category) return null
-
-  // (2) そのカテゴリのメンバースキーマで envelope を写像。
-  const msg = await client.messages.parse({
-    model: 'claude-opus-4-8', // envelope 写像は成立判定に効くので精度優先。軽くするなら claude-haiku-4-5。
-    max_tokens: 4096,
-    system: `${SYSTEM}\n\nこの製品のカテゴリは「${category}」と確定済みです。その envelope を埋めてください。`,
-    messages: [{ role: 'user', content: userContent }],
-    output_config: { format: zodOutputFormat(CATEGORY_SCHEMAS[category]) },
-  })
-  if (msg.stop_reason === 'refusal' || !msg.parsed_output) return null
-
-  // 出典・価格・id・status は事実が確かなスクリプト側で権威的に上書き（provenance 整合）。
-  const mapped = msg.parsed_output as Equipment
-  const id = slug('dk', facts.mfr || mapped.vendor, facts.partNo || mapped.name)
-  return {
-    ...mapped,
-    id,
-    status: 'candidate',
-    source: {
-      adapter: 'api-distributor',
-      distributor: 'DigiKey',
-      ...(facts.url ? { sourceUrl: facts.url } : {}),
-      fetchedAt: FETCHED_AT,
-      verify: true,
-    },
-    price: {
-      value: facts.unitPrice || mapped.price?.value || 0,
-      currency: LOCALE_CURRENCY,
-      asOf: FETCHED_AT.slice(0, 7),
-      verify: true,
-    },
-  }
-}
-
-// fetchedAt はワークフロー再現性のため引数化されないが、スクリプト実行時刻を1度だけ確定。
 const FETCHED_AT = new Date().toISOString()
+const client = new Anthropic()
 
 // --- 実行 -----------------------------------------------------------------
 const products: unknown[] = fixture
@@ -231,20 +118,32 @@ if (products.length === 0) {
 console.log(`${products.length} 件を写像します（Claude）…`)
 
 const mapped: Equipment[] = []
-for (const p of products) {
-  const eq = await mapToEquipment(p)
+for (const product of products) {
+  const facts = sourceFacts(product)
+  const eq = await mapEquipment(client, {
+    title: `${facts.mfr} ${facts.partNo}`.trim(),
+    raw: JSON.stringify(product, null, 2),
+  })
   if (!eq) {
     console.warn('  写像できなかった製品を1件スキップしました。')
     continue
   }
-  // 単一真実スキーマで最終検証（二重スキーマは持たない）。
-  const parsed = EquipmentSchema.safeParse(eq)
-  if (!parsed.success) {
-    console.warn(`  検証に失敗（スキップ）: ${eq.id} — ${parsed.error.issues[0]?.message}`)
-    continue
+  // 出典・価格・id・status は事実が確かなスクリプト側で権威的に上書き（provenance 整合）。
+  const stamped: Equipment = {
+    ...eq,
+    id: slug('dk', facts.mfr || eq.vendor, facts.partNo || eq.name),
+    status: 'candidate',
+    source: {
+      adapter: 'api-distributor',
+      distributor: 'DigiKey',
+      ...(facts.url ? { sourceUrl: facts.url } : {}),
+      fetchedAt: FETCHED_AT,
+      verify: true,
+    },
+    price: { value: facts.unitPrice || eq.price?.value || 0, currency: LOCALE_CURRENCY, asOf: FETCHED_AT.slice(0, 7), verify: true },
   }
-  mapped.push(parsed.data)
-  console.log(`  ✓ ${parsed.data.id} [${parsed.data.category}] ${parsed.data.name}`)
+  mapped.push(stamped)
+  console.log(`  ✓ ${stamped.id} [${stamped.category}] ${stamped.name}`)
 }
 
 if (mapped.length === 0) {
@@ -252,21 +151,10 @@ if (mapped.length === 0) {
   process.exit(1)
 }
 
-// 候補ファイルへマージ（id でデデュープ。後勝ち）。active seed には触れない。
-const existing = existsSync(outPath)
-  ? EquipmentSeedFileSchema.parse(JSON.parse(readFileSync(outPath, 'utf8'))).equipment
-  : []
-const byId = new Map(existing.map((e) => [e.id, e]))
-for (const e of mapped) byId.set(e.id, e)
-
-const file = {
-  _meta: {
-    description: 'api-distributor(DigiKey) 取込の候補。status:candidate。人レビューで active seed へ昇格する（ADR-0002）。',
-    posture: '出典付き・on-demand・非ミラー。価格/スペックは要検証(verify:true)。',
-    lastIngest: { keyword: keyword || `(fixture:${fixture})`, fetchedAt: FETCHED_AT, count: mapped.length },
-  },
-  equipment: [...byId.values()],
-}
-writeFileSync(outPath, JSON.stringify(file, null, 2) + '\n', 'utf8')
-console.log(`\n${mapped.length} 件を候補として ${outPath} に保存（計 ${file.equipment.length} 件）。`)
+const total = mergeWrite(outPath, mapped, {
+  description: 'api-distributor(DigiKey) 取込の候補。status:candidate。人レビューで active seed へ昇格する（ADR-0002）。',
+  posture: '出典付き・on-demand・非ミラー。価格/スペックは要検証(verify:true)。',
+  lastIngest: { keyword: keyword || `(fixture:${fixture})`, fetchedAt: FETCHED_AT, count: mapped.length },
+})
+console.log(`\n${mapped.length} 件を候補として ${outPath} に保存（計 ${total} 件）。`)
 console.log('次は人レビュー: 値を検証し status を active に上げると成立判定に入ります。')

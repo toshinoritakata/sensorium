@@ -9,6 +9,7 @@
     "cli": "tsx scripts/cli.ts",
     "ask": "tsx scripts/ask.ts",
     "ingest:digikey": "tsx --env-file-if-exists=.env scripts/ingest-digikey.ts",
+    "ingest:url": "tsx --env-file-if-exists=.env scripts/ingest-url.ts",
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "devDependencies": {
