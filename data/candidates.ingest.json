@@ -1,0 +1,989 @@
+{
+  "_meta": {
+    "description": "api-distributor(DigiKey) 取込の候補。status:candidate。人レビューで active seed へ昇格する（ADR-0002）。",
+    "posture": "出典付き・on-demand・非ミラー。価格/スペックは要検証(verify:true)。",
+    "lastIngest": {
+      "keyword": "radar sensor module",
+      "fetchedAt": "2026-06-21T02:30:09.393Z",
+      "count": 5
+    }
+  },
+  "equipment": [
+    {
+      "id": "dk-dfrobot-sen0208",
+      "name": "DFRobot SEN0208 Weatherproof Ultrasonic Sensor",
+      "vendor": "DFRobot",
+      "rolesProvided": [
+        "sense"
+      ],
+      "sensingMethod": [
+        "ultrasonic"
+      ],
+      "servesModality": [
+        "touch"
+      ],
+      "providesFeedback": [],
+      "price": {
+        "value": 16,
+        "currency": "USD",
+        "asOf": "2026-06",
+        "verify": true
+      },
+      "interface": {
+        "type": "analog",
+        "spec": "Analog voltage output",
+        "connector": "wire-leads",
+        "maxCableLength_m": 2,
+        "power": "5V DC"
+      },
+      "powerW": 0.5,
+      "computeNeed": "adc-microcontroller",
+      "mountingNeed": "surface-mount probe (weatherproof, separate probe)",
+      "status": "candidate",
+      "source": {
+        "adapter": "api-distributor",
+        "sourceUrl": "https://www.digikey.com/en/products/detail/dfrobot/SEN0208/6588472",
+        "distributor": "DigiKey",
+        "fetchedAt": "2026-06-21T02:27:10.611Z",
+        "verify": true
+      },
+      "confidence": {},
+      "notes": "Weatherproof ultrasonic distance sensor with separate probe. Sensing range and resolution not specified in distributor parameters; representative values used.",
+      "category": "distance-1d",
+      "measureRange_m": [
+        0.25,
+        4.5
+      ],
+      "beamAngle_deg": 60,
+      "resolution_mm": 10,
+      "responseTimeMs": 50,
+      "output": "analog"
+    },
+    {
+      "id": "dk-m5stack-technology-co-ltd-u098-b1",
+      "name": "M5Stack Ultrasonic Distance Unit I2C (U098-B1)",
+      "vendor": "M5Stack Technology Co., Ltd.",
+      "rolesProvided": [
+        "sense"
+      ],
+      "sensingMethod": [
+        "ultrasonic"
+      ],
+      "servesModality": [
+        "touch"
+      ],
+      "providesFeedback": [],
+      "price": {
+        "value": 5.95,
+        "currency": "USD",
+        "asOf": "2026-06",
+        "verify": true
+      },
+      "interface": {
+        "type": "i2c",
+        "spec": "I2C (RCWL-9620)",
+        "connector": "Grove HY2.0-4P",
+        "maxCableLength_m": 1,
+        "power": "5V via Grove"
+      },
+      "powerW": 0.5,
+      "computeNeed": "i2c-host (microcontroller/SBC)",
+      "mountingNeed": "M5Stack unit enclosure / front-facing flat mount",
+      "status": "candidate",
+      "source": {
+        "adapter": "api-distributor",
+        "sourceUrl": "https://www.digikey.com/en/products/detail/m5stack-technology-co-ltd/U098-B1/15839050",
+        "distributor": "DigiKey",
+        "fetchedAt": "2026-06-21T02:27:10.611Z",
+        "verify": true
+      },
+      "confidence": {},
+      "notes": "RCWL-9620 ultrasonic distance unit. Range, beam angle, resolution and response time estimated from RCWL-9620 typical specs.",
+      "category": "distance-1d",
+      "measureRange_m": [
+        0.02,
+        4.5
+      ],
+      "beamAngle_deg": 15,
+      "resolution_mm": 1,
+      "responseTimeMs": 100,
+      "output": "distance_mm over I2C"
+    },
+    {
+      "id": "dk-sparkfun-electronics-sen-28798",
+      "name": "SparkFun Ultrasonic Distance Sensor SEN-28798 (HC-SR04-R)",
+      "vendor": "SparkFun Electronics",
+      "rolesProvided": [
+        "sense"
+      ],
+      "sensingMethod": [
+        "ultrasonic"
+      ],
+      "servesModality": [
+        "touch"
+      ],
+      "providesFeedback": [],
+      "price": {
+        "value": 6.95,
+        "currency": "USD",
+        "asOf": "2026-06",
+        "verify": true
+      },
+      "interface": {
+        "type": "gpio",
+        "spec": "trigger/echo digital pins, 40kHz",
+        "connector": "header",
+        "maxCableLength_m": 0.3,
+        "power": "3.3V~5V"
+      },
+      "powerW": 0.075,
+      "computeNeed": "microcontroller (timer/GPIO for echo pulse)",
+      "mountingNeed": "PCB/panel mount facing detection zone",
+      "status": "candidate",
+      "source": {
+        "adapter": "api-distributor",
+        "sourceUrl": "https://www.digikey.com/en/products/detail/sparkfun-electronics/SEN-28798/26769982",
+        "distributor": "DigiKey",
+        "fetchedAt": "2026-06-21T02:27:10.611Z",
+        "verify": true
+      },
+      "confidence": {},
+      "notes": "HC-SR04-R style 40kHz ultrasonic ranging module. measureRange, resolution and responseTime estimated from typical HC-SR04 specs.",
+      "category": "distance-1d",
+      "measureRange_m": [
+        0.02,
+        4
+      ],
+      "beamAngle_deg": 15,
+      "resolution_mm": 3,
+      "responseTimeMs": 60,
+      "output": "trigger/echo pulse-width (distance from echo timing)"
+    },
+    {
+      "id": "dk-sparkfun-electronics-24049",
+      "name": "SparkFun Electronics 24049 (HC-SR04 XRP Ultrasonic Sensor)",
+      "vendor": "SparkFun Electronics",
+      "rolesProvided": [
+        "sense"
+      ],
+      "sensingMethod": [
+        "ultrasonic"
+      ],
+      "servesModality": [
+        "touch"
+      ],
+      "providesFeedback": [],
+      "price": {
+        "value": 7.01,
+        "currency": "USD",
+        "asOf": "2026-06",
+        "verify": true
+      },
+      "interface": {
+        "type": "gpio",
+        "spec": "Trigger/Echo digital pulse (HC-SR04)",
+        "connector": "header-pins",
+        "maxCableLength_m": 2,
+        "power": "3.3V-5V"
+      },
+      "powerW": 0.075,
+      "computeNeed": "microcontroller-gpio",
+      "mountingNeed": "PCB/header mount, faces target along sensing axis",
+      "status": "candidate",
+      "source": {
+        "adapter": "api-distributor",
+        "sourceUrl": "https://www.digikey.com/en/products/detail/sparkfun-electronics/24049/22258319",
+        "distributor": "DigiKey",
+        "fetchedAt": "2026-06-21T02:27:10.611Z",
+        "verify": true
+      },
+      "confidence": {},
+      "notes": "HC-SR04 based ultrasonic distance sensor evaluation board (XRP series). Supply 3.3V~5V.",
+      "category": "distance-1d",
+      "measureRange_m": [
+        0.02,
+        4
+      ],
+      "beamAngle_deg": 15,
+      "resolution_mm": 3,
+      "responseTimeMs": 60,
+      "output": "trigger-echo pulse (distance via time-of-flight)"
+    },
+    {
+      "id": "dk-gearbox-labs-part-hcsr-04",
+      "name": "Gearbox Labs PART HCSR-04",
+      "vendor": "Gearbox Labs",
+      "rolesProvided": [
+        "sense"
+      ],
+      "sensingMethod": [
+        "ultrasonic"
+      ],
+      "servesModality": [
+        "touch"
+      ],
+      "providesFeedback": [],
+      "price": {
+        "value": 5,
+        "currency": "USD",
+        "asOf": "2026-06",
+        "verify": true
+      },
+      "interface": {
+        "type": "gpio",
+        "spec": "trigger/echo digital I/O, 40kHz ultrasonic",
+        "connector": "header",
+        "maxCableLength_m": 1,
+        "power": "5V DC"
+      },
+      "powerW": 0.075,
+      "computeNeed": "microcontroller (timing of echo pulse, e.g. Arduino/RPi)",
+      "mountingNeed": "front-facing fixed bracket, clear line of sight",
+      "status": "candidate",
+      "source": {
+        "adapter": "api-distributor",
+        "sourceUrl": "https://www.digikey.com/en/products/detail/gearbox-labs/PART-HCSR-04/16159936",
+        "distributor": "DigiKey",
+        "fetchedAt": "2026-06-21T02:27:10.611Z",
+        "verify": true
+      },
+      "confidence": {},
+      "notes": "HC-SR04 style 40kHz ultrasonic distance module. Range/resolution/response estimated from typical HC-SR04 specs; beam angle from product parameter (15°).",
+      "category": "distance-1d",
+      "measureRange_m": [
+        0.02,
+        4
+      ],
+      "beamAngle_deg": 15,
+      "resolution_mm": 3,
+      "responseTimeMs": 60,
+      "output": "trigger/echo pulse-width (time-of-flight); distance derived in MCU"
+    },
+    {
+      "id": "dk-zilog-zre200ge",
+      "name": "Zilog ZRE200GE",
+      "vendor": "Zilog",
+      "rolesProvided": [
+        "sense"
+      ],
+      "sensingMethod": [
+        "ir-passive"
+      ],
+      "servesModality": [
+        "gesture"
+      ],
+      "price": {
+        "value": 1.29,
+        "currency": "USD",
+        "asOf": "2026-06",
+        "verify": true
+      },
+      "interface": {
+        "type": "analog",
+        "spec": "Dual element PIR analog output, 3V~15V supply",
+        "connector": "TO-5-3",
+        "maxCableLength_m": 1,
+        "power": "3V~15V DC"
+      },
+      "powerW": 0.001,
+      "computeNeed": "requires external PIR controller/op-amp (e.g. ZMOTION ZdotsSBC) to process analog dual-element output",
+      "mountingNeed": "PCB mount through-hole (TO-5-3 metal can), needs Fresnel lens for field of view",
+      "status": "candidate",
+      "source": {
+        "adapter": "api-distributor",
+        "sourceUrl": "https://www.digikey.com/en/products/detail/zilog/ZRE200GE/5147335",
+        "distributor": "DigiKey",
+        "fetchedAt": "2026-06-21T02:28:00.897Z",
+        "verify": true
+      },
+      "category": "motion-pir",
+      "detectionRange_m": 5,
+      "detectionAngle_deg": 100,
+      "holdTimeMs": 2000,
+      "output": "analog (dual element)"
+    },
+    {
+      "id": "dk-zilog-zncl10r",
+      "name": "Zilog ZNCL10R",
+      "vendor": "Zilog",
+      "rolesProvided": [
+        "mount"
+      ],
+      "sensingMethod": [],
+      "servesModality": [],
+      "price": {
+        "value": 1.62,
+        "currency": "USD",
+        "asOf": "2026-06",
+        "verify": true
+      },
+      "interface": {
+        "type": "none",
+        "spec": "passive optical accessory",
+        "connector": "none",
+        "maxCableLength_m": 0,
+        "power": "none"
+      },
+      "powerW": 0,
+      "computeNeed": "none",
+      "mountingNeed": "clip-on circular lens for Zilog pyroelectric PIR sensors",
+      "status": "candidate",
+      "source": {
+        "adapter": "api-distributor",
+        "sourceUrl": "https://www.digikey.com/en/products/detail/zilog/ZNCL10R/5147336",
+        "distributor": "DigiKey",
+        "fetchedAt": "2026-06-21T02:28:00.897Z",
+        "verify": true
+      },
+      "confidence": {},
+      "notes": "PIRレンズ（クリップオン円形）。単体では検出に使えない光学アクセサリのため support に分類。",
+      "category": "support"
+    },
+    {
+      "id": "dk-excelitas-technologies-pyd-1598-7655",
+      "name": "Excelitas Technologies PYD 1598 / 7655",
+      "vendor": "Excelitas Technologies",
+      "rolesProvided": [
+        "sense"
+      ],
+      "sensingMethod": [
+        "ir-passive"
+      ],
+      "servesModality": [
+        "touch",
+        "gesture"
+      ],
+      "providesFeedback": [],
+      "price": {
+        "value": 5.03,
+        "currency": "USD",
+        "asOf": "2026-06",
+        "verify": true
+      },
+      "interface": {
+        "type": "digital",
+        "spec": "DigiPyro digital output (SPI/serial)",
+        "connector": "TO-5 pins",
+        "maxCableLength_m": 0.3,
+        "power": "1.8V~3.6V"
+      },
+      "powerW": 0.001,
+      "computeNeed": "Requires host MCU to read digital serial output and interpret motion events",
+      "mountingNeed": "PCB-mounted PIR sensor; requires Fresnel lens and enclosure aligned to detection zone",
+      "status": "candidate",
+      "source": {
+        "adapter": "api-distributor",
+        "sourceUrl": "https://www.digikey.com/en/products/detail/excelitas-technologies/PYD-1598-7655/6615456",
+        "distributor": "DigiKey",
+        "fetchedAt": "2026-06-21T02:28:00.897Z",
+        "verify": true
+      },
+      "confidence": {},
+      "notes": "",
+      "category": "motion-pir",
+      "detectionRange_m": 5,
+      "detectionAngle_deg": 90,
+      "holdTimeMs": 2000,
+      "output": "digital-serial (DigiPyro, motion event); detrange/angle/hold depend on chosen Fresnel lens and host config"
+    },
+    {
+      "id": "dk-excelitas-technologies-pyq-1548-7659",
+      "name": "Excelitas Technologies PYQ 1548/7659",
+      "vendor": "Excelitas Technologies",
+      "rolesProvided": [
+        "sense"
+      ],
+      "sensingMethod": [
+        "pir-passive-infrared"
+      ],
+      "servesModality": [
+        "touch"
+      ],
+      "providesFeedback": [],
+      "price": {
+        "value": 5.6,
+        "currency": "USD",
+        "asOf": "2026-06",
+        "verify": true
+      },
+      "interface": {
+        "type": "digital",
+        "spec": "Digital output (DigiPyro), 1.8V~3.6V supply",
+        "connector": "TO-5 4-lead metal can",
+        "maxCableLength_m": 0.3,
+        "power": "1.8V~3.6V DC"
+      },
+      "powerW": 0.001,
+      "computeNeed": "Requires host MCU to read digital motion output; needs Fresnel lens for usable field of view",
+      "mountingNeed": "PCB-mount TO-5 package; pair with Fresnel lens and enclosure facing detection area",
+      "status": "candidate",
+      "source": {
+        "adapter": "api-distributor",
+        "sourceUrl": "https://www.digikey.com/en/products/detail/excelitas-technologies/PYQ-1548-7659/9749550",
+        "distributor": "DigiKey",
+        "fetchedAt": "2026-06-21T02:28:00.897Z",
+        "verify": true
+      },
+      "confidence": {},
+      "notes": "Low-power digital PIR pyroelectric sensor element. Detection range and angle depend on the Fresnel lens used (not included); values below are class-typical estimates. Datasheet sensing distance and operating temperature listed as '-'.",
+      "category": "motion-pir",
+      "detectionRange_m": 5,
+      "detectionAngle_deg": 90,
+      "holdTimeMs": 2000,
+      "output": "digital"
+    },
+    {
+      "id": "dk-excelitas-technologies-pyq-1548-7660",
+      "name": "Excelitas Technologies PYQ 1548/7660",
+      "vendor": "Excelitas Technologies",
+      "rolesProvided": [
+        "sense"
+      ],
+      "sensingMethod": [
+        "ir-passive"
+      ],
+      "servesModality": [
+        "touch",
+        "gesture"
+      ],
+      "providesFeedback": [],
+      "price": {
+        "value": 5.6,
+        "currency": "USD",
+        "asOf": "2026-06",
+        "verify": true
+      },
+      "interface": {
+        "type": "digital",
+        "spec": "Digital output, 1.8V~3.6V supply, internal trigger",
+        "connector": "TO-5 4-lead metal can",
+        "maxCableLength_m": 1,
+        "power": "1.8V-3.6V DC"
+      },
+      "powerW": 0.0001,
+      "computeNeed": "none",
+      "mountingNeed": "PCB through-hole with IR-transparent lens window",
+      "status": "candidate",
+      "source": {
+        "adapter": "api-distributor",
+        "sourceUrl": "https://www.digikey.com/en/products/detail/excelitas-technologies/PYQ-1548-7660/6615457",
+        "distributor": "DigiKey",
+        "fetchedAt": "2026-06-21T02:28:00.897Z",
+        "verify": true
+      },
+      "confidence": {},
+      "notes": "Low power DigiPyro PIR motion sensor with digital output and internal trigger. Detection range/angle depend on attached lens (not specified).",
+      "category": "motion-pir",
+      "detectionRange_m": 5,
+      "detectionAngle_deg": 90,
+      "holdTimeMs": 2000,
+      "output": "digital"
+    },
+    {
+      "id": "dk-sharp-socle-technology-gp2s60",
+      "name": "SHARP/Socle Technology GP2S60",
+      "vendor": "SHARP/Socle Technology",
+      "rolesProvided": [
+        "sense"
+      ],
+      "sensingMethod": [
+        "ir-active",
+        "reflective-optical"
+      ],
+      "servesModality": [
+        "touch"
+      ],
+      "price": {
+        "value": 0.63,
+        "currency": "USD",
+        "asOf": "2026-06",
+        "verify": true
+      },
+      "interface": {
+        "type": "analog",
+        "spec": "phototransistor output, Vce 35V, Ic 20mA, If 50mA",
+        "connector": "4-SMD No Lead",
+        "maxCableLength_m": 0.3,
+        "power": "3.3-5V via emitter/collector circuit"
+      },
+      "powerW": 0.25,
+      "computeNeed": "ADC/GPIO on host MCU for analog reflective output",
+      "mountingNeed": "PCB surface-mount (4-SMD, No Lead); requires custom carrier board",
+      "status": "candidate",
+      "source": {
+        "adapter": "api-distributor",
+        "sourceUrl": "https://www.digikey.com/en/products/detail/sharp-socle-technology/GP2S60/457882",
+        "distributor": "DigiKey",
+        "fetchedAt": "2026-06-21T02:28:47.679Z",
+        "verify": true
+      },
+      "confidence": {},
+      "notes": "Reflective optical sensor (photointerrupter), sensing distance 0.7mm. Bare component requiring carrier/driver circuit; classified as support since not directly usable for person/object detection in exhibits. Response time 20µs. powerW and maxCableLength_m are representative estimates (low, 推定).",
+      "category": "support"
+    },
+    {
+      "id": "dk-onsemi-qre1113gr",
+      "name": "onsemi QRE1113GR",
+      "vendor": "onsemi",
+      "rolesProvided": [
+        "sense"
+      ],
+      "sensingMethod": [
+        "ir-active",
+        "reflective"
+      ],
+      "servesModality": [
+        "touch"
+      ],
+      "providesFeedback": [],
+      "price": {
+        "value": 1.13,
+        "currency": "USD",
+        "asOf": "2026-06",
+        "verify": true
+      },
+      "interface": {
+        "type": "analog",
+        "spec": "Phototransistor analog output, IF max 50mA, IC max 20mA, VCEO 30V",
+        "connector": "4-SMD Gull Wing",
+        "maxCableLength_m": 0.1,
+        "power": "5V DC typical"
+      },
+      "powerW": 0.1,
+      "computeNeed": "ADC/MCU required to read analog phototransistor output",
+      "mountingNeed": "Surface mount (SMD) on PCB; place 1mm from reflective surface",
+      "status": "candidate",
+      "source": {
+        "adapter": "api-distributor",
+        "sourceUrl": "https://www.digikey.com/en/products/detail/onsemi/QRE1113GR/965451",
+        "distributor": "DigiKey",
+        "fetchedAt": "2026-06-21T02:28:47.679Z",
+        "verify": true
+      },
+      "confidence": {},
+      "notes": "Reflective optical sensor (analog output). Very short-range proximity/reflectance detection (~1mm). Useful as a 1D distance/presence element requiring own ADC and emitter drive.",
+      "category": "distance-1d",
+      "measureRange_m": [
+        0.0005,
+        0.005
+      ],
+      "beamAngle_deg": 40,
+      "resolution_mm": 0.1,
+      "responseTimeMs": 0.02,
+      "output": "analog"
+    },
+    {
+      "id": "dk-sharp-socle-technology-gp2s700hcp",
+      "name": "SHARP/Socle Technology GP2S700HCP",
+      "vendor": "SHARP/Socle Technology",
+      "rolesProvided": [
+        "sense"
+      ],
+      "sensingMethod": [
+        "ir-active",
+        "reflective-optical"
+      ],
+      "servesModality": [
+        "touch"
+      ],
+      "providesFeedback": [],
+      "price": {
+        "value": 1.2,
+        "currency": "USD",
+        "asOf": "2026-06",
+        "verify": true
+      },
+      "interface": {
+        "type": "analog",
+        "spec": "Phototransistor analog output, Vceo 35V, Ic 20mA, If 50mA",
+        "connector": "4-SMD",
+        "maxCableLength_m": 0.3,
+        "power": "DC (LED forward + phototransistor bias)"
+      },
+      "powerW": 0.1,
+      "computeNeed": "ADC/microcontroller required for threshold interpretation",
+      "mountingNeed": "Surface Mount (4-SMD) onto PCB",
+      "status": "candidate",
+      "source": {
+        "adapter": "api-distributor",
+        "sourceUrl": "https://www.digikey.com/en/products/detail/sharp-socle-technology/GP2S700HCP/696137",
+        "distributor": "DigiKey",
+        "fetchedAt": "2026-06-21T02:28:47.679Z",
+        "verify": true
+      },
+      "confidence": {},
+      "notes": "反射型フォトインタラプタ（近接検出用）。検出距離は固定的（〜5.5mm）で1次元の近接センサ。距離はアナログ出力から推定する必要があり、ADC等の外部回路が前提。",
+      "category": "distance-1d",
+      "measureRange_m": [
+        0,
+        0.0055
+      ],
+      "beamAngle_deg": 40,
+      "resolution_mm": 0.1,
+      "responseTimeMs": 0.02,
+      "output": "analog"
+    },
+    {
+      "id": "dk-onsemi-qrd1114",
+      "name": "onsemi QRD1114",
+      "vendor": "onsemi",
+      "rolesProvided": [
+        "sense"
+      ],
+      "sensingMethod": [
+        "ir-active",
+        "reflective"
+      ],
+      "servesModality": [
+        "touch"
+      ],
+      "providesFeedback": [],
+      "price": {
+        "value": 1.33,
+        "currency": "USD",
+        "asOf": "2026-06",
+        "verify": true
+      },
+      "interface": {
+        "type": "analog",
+        "spec": "Phototransistor analog output, 30V Vceo, 50mA If max",
+        "connector": "Radial - 4 Leads (through hole)",
+        "maxCableLength_m": 0.3,
+        "power": "externally biased, ~5V via current-limiting resistors"
+      },
+      "powerW": 0.1,
+      "computeNeed": "ADC/GPIO on microcontroller to read analog/threshold output",
+      "mountingNeed": "Through-hole PCB mounting; sensor faces target surface at ~1.27mm",
+      "status": "candidate",
+      "source": {
+        "adapter": "api-distributor",
+        "sourceUrl": "https://www.digikey.com/en/products/detail/onsemi/QRD1114/187536",
+        "distributor": "DigiKey",
+        "fetchedAt": "2026-06-21T02:28:47.679Z",
+        "verify": true
+      },
+      "confidence": {},
+      "notes": "Reflective optical sensor (IR LED + phototransistor). Very short range proximity/reflectance detection, suited for close surface or line/edge detection rather than long-range distance ranging.",
+      "category": "distance-1d",
+      "measureRange_m": [
+        0.001,
+        0.01
+      ],
+      "beamAngle_deg": 40,
+      "resolution_mm": 0.5,
+      "responseTimeMs": 0.05,
+      "output": "analog phototransistor current (reflectance-proportional)"
+    },
+    {
+      "id": "dk-vishay-semiconductor-opto-division-cny70",
+      "name": "Vishay Semiconductor Opto Division CNY70",
+      "vendor": "Vishay Semiconductor Opto Division",
+      "rolesProvided": [
+        "sense"
+      ],
+      "sensingMethod": [
+        "ir-active",
+        "reflective"
+      ],
+      "servesModality": [
+        "touch"
+      ],
+      "providesFeedback": [],
+      "price": {
+        "value": 1.38,
+        "currency": "USD",
+        "asOf": "2026-06",
+        "verify": true
+      },
+      "interface": {
+        "type": "analog",
+        "spec": "phototransistor analog output, IR emitter + receiver",
+        "connector": "through-hole PCB pins",
+        "maxCableLength_m": 0.3,
+        "power": "5V external bias required"
+      },
+      "powerW": 0.25,
+      "computeNeed": "external ADC/microcontroller to threshold analog reflectance signal",
+      "mountingNeed": "through-hole PCB mount; sensor faces target within ~5mm",
+      "status": "candidate",
+      "source": {
+        "adapter": "api-distributor",
+        "sourceUrl": "https://www.digikey.com/en/products/detail/vishay-semiconductor-opto-division/CNY70/1681159",
+        "distributor": "DigiKey",
+        "fetchedAt": "2026-06-21T02:28:47.679Z",
+        "verify": true
+      },
+      "category": "distance-1d",
+      "measureRange_m": [
+        0,
+        0.005
+      ],
+      "beamAngle_deg": 16,
+      "resolution_mm": 1,
+      "responseTimeMs": 1,
+      "output": "analog (phototransistor collector current proportional to reflected IR)"
+    },
+    {
+      "id": "dk-acconeer-ab-xm125",
+      "name": "Acconeer AB XM125",
+      "vendor": "Acconeer AB",
+      "rolesProvided": [
+        "sense"
+      ],
+      "sensingMethod": [
+        "radar"
+      ],
+      "servesModality": [
+        "touch",
+        "gesture"
+      ],
+      "providesFeedback": [],
+      "price": {
+        "value": 22.2,
+        "currency": "USD",
+        "asOf": "2026-06",
+        "verify": true
+      },
+      "interface": {
+        "type": "serial",
+        "spec": "UART/I2C",
+        "connector": "header",
+        "maxCableLength_m": 1,
+        "power": "5V USB / 3.3V"
+      },
+      "powerW": 0.5,
+      "computeNeed": "onboard (integrated MCU, A121 60GHz radar)",
+      "mountingNeed": "PCB module mount / enclosure behind non-metallic surface",
+      "status": "candidate",
+      "source": {
+        "adapter": "api-distributor",
+        "sourceUrl": "https://www.digikey.com/en/products/detail/acconeer-ab/XM125/17883267",
+        "distributor": "DigiKey",
+        "fetchedAt": "2026-06-21T02:30:09.393Z",
+        "verify": true
+      },
+      "confidence": {},
+      "notes": "A121 ENTRY+ pulsed coherent radar sensor module. Range and FOV are class-typical estimates; consult datasheet for exact figures. Suitable for presence/distance/motion detection in interactive installations.",
+      "category": "radar-presence",
+      "range_m": 7,
+      "fov_deg": 50,
+      "capabilities": [
+        "presence-detection",
+        "distance-measurement",
+        "motion-detection",
+        "micro-movement"
+      ],
+      "responseTimeMs": 50,
+      "output": "digital (UART/I2C presence & distance data)"
+    },
+    {
+      "id": "dk-acconeer-ab-xm132",
+      "name": "Acconeer AB XM132",
+      "vendor": "Acconeer AB",
+      "rolesProvided": [
+        "sense"
+      ],
+      "sensingMethod": [
+        "radar",
+        "pulsed-coherent-radar"
+      ],
+      "servesModality": [
+        "touch",
+        "gesture"
+      ],
+      "providesFeedback": [],
+      "price": {
+        "value": 29.41,
+        "currency": "USD",
+        "asOf": "2026-06",
+        "verify": true
+      },
+      "interface": {
+        "type": "serial",
+        "spec": "UART",
+        "connector": "header",
+        "maxCableLength_m": 1,
+        "power": "3.3V"
+      },
+      "powerW": 0.5,
+      "computeNeed": "onboard-mcu",
+      "mountingNeed": "pcb-module-mount",
+      "status": "candidate",
+      "source": {
+        "adapter": "api-distributor",
+        "sourceUrl": "https://www.digikey.com/en/products/detail/acconeer-ab/XM132/13157814",
+        "distributor": "DigiKey",
+        "fetchedAt": "2026-06-21T02:30:09.393Z",
+        "verify": true
+      },
+      "confidence": {},
+      "notes": "A111 Entry Radar Sensor Module (XM132) with onboard MCU. Pulsed coherent radar (PCR) for presence/distance detection. Interface, power, range and FOV estimated from class-typical values as datasheet parameters were not present in raw data.",
+      "category": "radar-presence",
+      "range_m": 2,
+      "fov_deg": 80,
+      "capabilities": [
+        "presence-detection",
+        "distance-measurement",
+        "motion-detection"
+      ],
+      "responseTimeMs": 50,
+      "output": "digital-uart"
+    },
+    {
+      "id": "dk-acconeer-ab-xm126",
+      "name": "Acconeer AB XM126",
+      "vendor": "Acconeer AB",
+      "rolesProvided": [
+        "sense"
+      ],
+      "sensingMethod": [
+        "radar"
+      ],
+      "servesModality": [
+        "touch",
+        "gesture"
+      ],
+      "providesFeedback": [],
+      "price": {
+        "value": 33.55,
+        "currency": "USD",
+        "asOf": "2026-06",
+        "verify": true
+      },
+      "interface": {
+        "type": "digital",
+        "spec": "UART/SPI",
+        "connector": "header",
+        "maxCableLength_m": 1,
+        "power": "3.3V DC"
+      },
+      "powerW": 0.5,
+      "computeNeed": "onboard MCU (nRF5340); host integration via SDK",
+      "mountingNeed": "PCB module, fixed mount behind RF-transparent surface",
+      "status": "candidate",
+      "source": {
+        "adapter": "api-distributor",
+        "sourceUrl": "https://www.digikey.com/en/products/detail/acconeer-ab/XM126/21735750",
+        "distributor": "DigiKey",
+        "fetchedAt": "2026-06-21T02:30:09.393Z",
+        "verify": true
+      },
+      "category": "radar-presence",
+      "range_m": 20,
+      "fov_deg": 80,
+      "capabilities": [
+        "presence-detection",
+        "distance-measurement",
+        "motion-detection",
+        "micro-motion"
+      ],
+      "responseTimeMs": 100,
+      "output": "digital (presence/distance data via UART/SPI):contentReference[o"
+    },
+    {
+      "id": "dk-acconeer-ab-xm122",
+      "name": "Acconeer AB XM122",
+      "vendor": "Acconeer AB",
+      "rolesProvided": [
+        "sense"
+      ],
+      "sensingMethod": [
+        "radar"
+      ],
+      "servesModality": [
+        "touch",
+        "gesture"
+      ],
+      "providesFeedback": [],
+      "price": {
+        "value": 38.13,
+        "currency": "USD",
+        "asOf": "2026-06",
+        "verify": true
+      },
+      "interface": {
+        "type": "digital",
+        "spec": "UART/SPI (module GPIO)",
+        "connector": "header",
+        "maxCableLength_m": 0.3,
+        "power": "3.3V DC"
+      },
+      "powerW": 0.5,
+      "computeNeed": "host-mcu",
+      "mountingNeed": "pcb-module-mount",
+      "status": "candidate",
+      "source": {
+        "adapter": "api-distributor",
+        "sourceUrl": "https://www.digikey.com/en/products/detail/acconeer-ab/XM122/10447766",
+        "distributor": "DigiKey",
+        "fetchedAt": "2026-06-21T02:30:09.393Z",
+        "verify": true
+      },
+      "confidence": {},
+      "notes": "A111 pulsed coherent radar (PCR) IoT module (XM122). Range/FOV/power are class-typical estimates; module uses XB122 breakout. Verify electrical and detection params against datasheet.",
+      "category": "radar-presence",
+      "range_m": 2,
+      "fov_deg": 40,
+      "capabilities": [
+        "presence-detection",
+        "micro-motion",
+        "distance"
+      ],
+      "responseTimeMs": 100,
+      "output": "digital"
+    },
+    {
+      "id": "dk-acconeer-ab-xb122",
+      "name": "Acconeer AB XB122",
+      "vendor": "Acconeer AB",
+      "rolesProvided": [
+        "sense"
+      ],
+      "sensingMethod": [
+        "radar"
+      ],
+      "servesModality": [
+        "touch",
+        "gesture"
+      ],
+      "providesFeedback": [],
+      "price": {
+        "value": 105.75,
+        "currency": "USD",
+        "asOf": "2026-06",
+        "verify": true
+      },
+      "interface": {
+        "type": "serial",
+        "spec": "UART, USB",
+        "connector": "USB",
+        "maxCableLength_m": 1.5,
+        "power": "5V via USB"
+      },
+      "powerW": 2.5,
+      "computeNeed": "host-required (XM122/XM126 module not included; needs host MCU/PC for radar processing)",
+      "mountingNeed": "PCB/board mount, requires enclosure for installation",
+      "status": "candidate",
+      "source": {
+        "adapter": "api-distributor",
+        "sourceUrl": "https://www.digikey.com/en/products/detail/acconeer-ab/XB122/10447797",
+        "distributor": "DigiKey",
+        "fetchedAt": "2026-06-21T02:30:09.393Z",
+        "verify": true
+      },
+      "confidence": {},
+      "notes": "60GHz pulsed coherent radar evaluation/breakout board for XM122/XM126. Main IC/module not included. Sensing range not specified in parameters; typical Acconeer A111/A121 range used as estimate.",
+      "category": "radar-presence",
+      "range_m": 7,
+      "fov_deg": 40,
+      "capabilities": [
+        "presence-detection",
+        "distance",
+        "motion",
+        "micro-motion"
+      ],
+      "responseTimeMs": 100,
+      "output": "digital (UART/USB serial radar data stream)"
+    }
+  ]
+}
