@@ -21,30 +21,28 @@ if (!process.env.ANTHROPIC_API_KEY) {
   process.exit(1)
 }
 
-/** Claude に強制適合させる抽出スキーマ。InteractionSpec に寄せつつ provenance を各所に持つ。 */
-const Provenance = z.enum(['stated', 'inferred', 'assumed'])
+/**
+ * モデル出力の検証スキーマ。形だけ持つ（モデルが読む説明文は下の JSON_SCHEMA 側に一本化）。
+ * structured output で形は保証されるが、念のためここで parse して型と妥当性を確定する。
+ */
 const ExtractionSchema = z.object({
-  title: z.string().describe('体験の短い名前'),
-  area_m2: z.number().nullable().describe('床/面の面積[m²]。円形なら半径から面積に直す。無ければ null'),
-  simultaneousUsers: z.number().nullable().describe('同時に体験する人数。無ければ null'),
-  responsiveness: z.enum(['tight', 'normal', 'relaxed']).describe('即応性。即時=tight, 普通=normal, 余裕可=relaxed'),
+  title: z.string(),
+  area_m2: z.number().nullable(),
+  simultaneousUsers: z.number().nullable(),
+  responsiveness: z.enum(['tight', 'normal', 'relaxed']),
   lighting: z.enum(['controlled', 'mixed', 'bright', 'dark', 'outdoor']).nullable(),
-  budgetJPY: z.number().nullable().describe('予算[円]。無ければ null'),
+  budgetJPY: z.number().nullable(),
   phenomena: z
     .array(
       z.object({
-        sensedTarget: z
-          .string()
-          .describe('検出すべき現象: step/weight/hands/fingers/limbs/fullBody/presence/motion/objectPresence/zoneCrossing/distance1d/count/voiceCommand 等'),
+        sensedTarget: z.string(),
         label: z.string(),
-        discrimination: z.enum(['occupancy', 'zoned', 'per-user']).nullable().describe('空間弁別。踏み有無のみ=occupancy, どこか=zoned, 個人追跡=per-user'),
+        discrimination: z.enum(['occupancy', 'zoned', 'per-user']).nullable(),
       }),
     )
     .min(1),
-  feedback: z
-    .array(z.object({ kind: z.enum(['floor-visual', 'surface-visual', 'sound', 'light']), label: z.string() }))
-    .describe('必要な出力。床が光る=floor-visual 等。無ければ空配列'),
-  provenanceNotes: z.array(z.object({ field: z.string(), provenance: Provenance })).describe('主要フィールドの出所（明記/推論/仮置き）'),
+  feedback: z.array(z.object({ kind: z.enum(['floor-visual', 'surface-visual', 'sound', 'light']), label: z.string() })),
+  provenanceNotes: z.array(z.object({ field: z.string(), provenance: z.enum(['stated', 'inferred', 'assumed']) })),
 })
 
 const SYSTEM = `あなたは FeasiSense の入口です。テクニカルディレクタの自由文から、体験の構造（InteractionSpec）を抽出します。
@@ -129,11 +127,16 @@ if (message.stop_reason === 'refusal') {
   console.error('Claude が拒否しました。'); process.exit(1)
 }
 const jsonText = message.content.find((b): b is Anthropic.TextBlock => b.type === 'text')?.text
-const ex = jsonText ? (JSON.parse(jsonText) as z.infer<typeof ExtractionSchema>) : null
-if (!ex) {
+if (!jsonText) {
   console.error('抽出に失敗しました。stop_reason:', message.stop_reason)
   process.exit(1)
 }
+const parsed = ExtractionSchema.safeParse(JSON.parse(jsonText))
+if (!parsed.success) {
+  console.error('抽出結果が想定スキーマに合いませんでした:', parsed.error.message)
+  process.exit(1)
+}
+const ex = parsed.data
 
 // 抽出結果 → InteractionSpec（null/空は省く）。
 const draft = {
