@@ -55,6 +55,10 @@ SensingChannel が必要とする機能単位。`sense`（検出）/ `interface`
 光学/センサーのハードウェアとは独立した検出ソフト・ミドルウェア（例: Microsoft Body Tracking SDK, Nuitrack, MediaPipe, ZED SDK, 自前点群人検出）。`sense` role はハードウェア × DetectionMethod のペアで埋まり、実効 envelope（解像できる `resolvableTargets` / `maxTrackedBodies` / レイテンシ）はペアの合成で決まる。同じカメラでも検出手法が違えば別案になりうる（“RealSense+Nuitrack案” vs “RealSense+MediaPipe案”）。compute role に乗る。一部ハードは検出手法が固定（Leap→Ultraleap, ZED→ZED SDK）、汎用 RGB/深度は複数手法と組める。
 _Avoid_: SDK（特定実装を指すとき以外）, アルゴリズム
 
+**検出系統（detection lineage）**:
+SensingChannel の `sense` role を埋める1つの流儀。Equipment の「2系統」（①リッチトラッキング系=ハードウェア × DetectionMethod のペア ②工業用センサー系=直接出力）に対応し、各系統が「ある SensedPhenomenon に対して sense 候補をどう列挙し、どう成立条件を立てるか」を一手に持つ。系統ごとに固有の Condition と metrics が異なる（リッチ系=precision・追跡定員、工業系=coverage/面積・ゾーン定員）が、latency/budget/feedback/Setup 包装は系統をまたいで共通。エンジンでは `ChannelEvaluator` として実装し、新しいセンサー系統の追加は新 ChannelEvaluator 1つで済む。複数系統が同じ現象を扱えるなら両方が Setup 候補を出す（センサー種別を横断）。
+_Avoid_: ストラテジ, ハンドラ, パイプライン
+
 **safety/circulation（安全・動線）**:
 Intrinsic な dimension。3つの下位チェックに分解する ── ①個人空間クリアランス（面積/人数 ≥ 最小占有面積、基準は usageModel × modality で変動）②動線・避難（通路・出入口、permanent で強化）③衝突半径（gesture の腕振り等の対人間隔）。基準値は既定値＋TD 上書き可能。**FeasiSense の安全判定は設計目安であり、建築基準・消防等の法令判断ではない**（その旨を出力に免責表示する）。
 _Avoid_: 安全性検査, 法令チェック
