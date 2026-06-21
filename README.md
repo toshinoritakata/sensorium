@@ -38,6 +38,30 @@ pnpm ask "踏むと光る床、直径10mの円形、20人くらい乗る"
 pnpm ask "暗い会場で手を振ると反応、キオスク、予算20万"
 ```
 
+### 機材取込: DigiKey（pnpm ingest:digikey）
+
+`api-distributor` アダプタ（ADR-0002）。キーワードで DigiKey を引き、生カタログを Claude が
+Equipment envelope へ写像して **`data/candidates.ingest.json` に `status:candidate` で保存**する。
+エンジンは active のみ読むので、取り込んでも**人レビューで昇格するまで成立判定には入らない**（候補ゲート）。
+
+```sh
+pnpm ingest:digikey "ultrasonic distance sensor" --limit 5
+pnpm ingest:digikey "PIR motion sensor" --out data/candidates.ingest.json
+pnpm ingest:digikey --fixture <生製品JSON>   # DigiKey 認証なしで写像だけ検証
+```
+
+要 `ANTHROPIC_API_KEY` ＋ DigiKey の OAuth キー（環境変数）:
+
+| 変数 | 既定 | 用途 |
+| --- | --- | --- |
+| `DIGIKEY_CLIENT_ID` / `DIGIKEY_CLIENT_SECRET` | （必須） | developer.digikey.com で発行する Product Information API キー |
+| `DIGIKEY_API_BASE` | `https://api.digikey.com` | サンドボックスに向けるなら上書き |
+| `DIGIKEY_LOCALE_SITE` / `_LANGUAGE` / `_CURRENCY` | `US` / `en` / `USD` | 検索ロケール・通貨 |
+
+法務姿勢（ADR-0002）: **出典付き・on-demand・非ミラー**。取込件数は既定5・上限25でキャップし、
+各候補に `source`（adapter / distributor / sourceUrl / fetchedAt / verify）を必ず付す。
+実行前に DigiKey の User Agreement（保存・レート規約）を確認すること。
+
 ## 現状の縦切り
 
 通っているパイプライン:
@@ -46,5 +70,7 @@ pnpm ask "暗い会場で手を振ると反応、キオスク、予算20万"
 - **spatial（カメラ × DetectionMethod）** — ハード×検出ソフトの互換ペアを合成し、解像・metrics・Condition を算出して候補化。
 - **Pareto フロンティア** — 5 軸の被支配案を消去する順位付け（CLI `--frontier`）。
 - **Claude 自然言語入口** — 自由文 → InteractionSpec の構造抽出（`pnpm ask`）。
+- **機材取込 api-distributor（DigiKey）** — キーワード検索 → Claude 写像 → `status:candidate` で候補ファイルへ（`pnpm ingest:digikey`）。
 
-後続: spatial の MountPlan 幾何（カメラ被覆 / FOV）、audio・touch の DetectionMethod 経路。
+後続: spatial の MountPlan 幾何（カメラ被覆 / FOV）、audio・touch の DetectionMethod 経路、
+取込候補の人レビュー昇格フロー、flat-file / url-extract アダプタ。

@@ -8,6 +8,7 @@
     "eval": "tsx scripts/evaluate-demo.ts",
     "cli": "tsx scripts/cli.ts",
     "ask": "tsx scripts/ask.ts",
+    "ingest:digikey": "tsx scripts/ingest-digikey.ts",
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "devDependencies": {
