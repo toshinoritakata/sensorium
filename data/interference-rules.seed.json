@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "description": "FeasiSense シード InterferenceRule DB。sensingMethod タグの組で書く。Setup 内の機材タグの組合せで発火し interference 次元の EquipmentCondition を生成。ユーザー編集可能。CONTEXT.md InterferenceRule 参照。",
+    "description": "Sensorium シード InterferenceRule DB。sensingMethod タグの組で書く。Setup 内の機材タグの組合せで発火し interference 次元の EquipmentCondition を生成。ユーザー編集可能。CONTEXT.md InterferenceRule 参照。",
     "firing": "between の全タグが Setup 内に(別機材として)存在し trigger 条件を満たすと発火。severity と緩和策適用可否で fail/warn を決める(dimensions.seed.json interference)。",
     "severityModel": "high=未緩和なら成立不可(fail) / med=性能低下(緩和で warn) / low=注意喚起(情報)。",
     "specDerivedNote": "acoustic-emit は体験の音響出力(スピーカー)を表す。DBにスピーカー機材が無くても、Spec が体験音/BGMを伴うなら暗黙の acoustic-emit として扱い、音声Channelとの干渉を発火させる。"

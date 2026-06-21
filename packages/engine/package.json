@@ -1,5 +1,5 @@
 {
-  "name": "@feasisense/engine",
+  "name": "@sensorium/engine",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -9,6 +9,6 @@
     "./load-seeds": "./src/load-seeds.ts"
   },
   "dependencies": {
-    "@feasisense/shared": "workspace:*"
+    "@sensorium/shared": "workspace:*"
   }
 }

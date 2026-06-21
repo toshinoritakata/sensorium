@@ -1,4 +1,4 @@
-import type { Equipment, EquipmentCategory } from '@feasisense/shared'
+import type { Equipment, EquipmentCategory } from '@sensorium/shared'
 
 /**
  * 工業用センサー系は DetectionMethod 無しで category から直接 sensedTarget が決まる

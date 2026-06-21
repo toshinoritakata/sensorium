@@ -8,7 +8,7 @@ import {
   type EvaluateResult,
   type InteractionSpec,
   type Setup,
-} from '@feasisense/shared'
+} from '@sensorium/shared'
 import { evaluate } from '../src/index'
 
 const setupOf = (r: EvaluateResult, anchorId: string): Setup =>

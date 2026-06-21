@@ -1,5 +1,5 @@
-import type { EvaluateResult, InteractionSpec, Setup } from '@feasisense/shared'
-import { isFeasible } from '@feasisense/shared'
+import type { EvaluateResult, InteractionSpec, Setup } from '@sensorium/shared'
+import { isFeasible } from '@sensorium/shared'
 
 const MARK: Record<string, string> = { ok: '✓', warn: '△', fail: '✗' }
 

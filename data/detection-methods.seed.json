@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "description": "FeasiSense シード DetectionMethod DB。光学ハードとペアで sense role を埋める検出ソフト。ユーザー編集可能。2026-01時点。",
+    "description": "Sensorium シード DetectionMethod DB。光学ハードとペアで sense role を埋める検出ソフト。ユーザー編集可能。2026-01時点。",
     "verifyPolicy": "ライセンス費・対応状況は要検証。providesTargets/maxTrackedBodies/addedLatencyMs は実装・ハード・人数で変動するため confidence 明記。",
     "pairingRule": "実効 resolvableTargets = providesTargets ∩ (ハードの depthType が許す範囲)。latency = ハード.sensorLatencyMs + addedLatencyMs。maxTrackedBodies = min(ハード現実上限, ここの値)。"
   },

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { Equipment } from '@feasisense/shared'
+import type { Equipment } from '@sensorium/shared'
 import { canDetect, directSensedTargets } from '../src/sensed-targets'
 import { loadAllEquipment } from '../src/load-seeds'
 

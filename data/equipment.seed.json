@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "description": "FeasiSense シード機材DB（光学/センサー ハードウェアのみ）。検出ソフトは detection-methods.seed.json。ユーザー編集可能。物理スペックは2026-01時点の公開情報ベース。",
+    "description": "Sensorium シード機材DB（光学/センサー ハードウェアのみ）。検出ソフトは detection-methods.seed.json。ユーザー編集可能。物理スペックは2026-01時点の公開情報ベース。",
     "verifyPolicy": "価格(price.verify=true)・生産終了状況・最新モデル・消費電力は要検証。物理スペック(FOV/距離/レイテンシ)は confidence で信頼度を表記。",
     "confidenceLegend": { "high": "公称値で安定", "med": "条件依存・概算", "low": "推定/現場で要実測" },
     "note": "spatial機材は『何を認識できるか/同時人数/推論レイテンシ』を持たない。それらは DetectionMethod とのペアで決まる。interface は type/spec/connector/maxCableLength_m/power。powerW は消費電力。"

@@ -1,4 +1,4 @@
-import { assertNever, type DetectionMethod, type Equipment, type InputModality } from '@feasisense/shared'
+import { assertNever, type DetectionMethod, type Equipment, type InputModality } from '@sensorium/shared'
 
 /** spatial 光学ハードウェア（depthType を持つ category:'spatial'）。 */
 export type SpatialEquipment = Extract<Equipment, { category: 'spatial' }>

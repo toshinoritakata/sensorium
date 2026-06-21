@@ -1,4 +1,4 @@
-# FeasiSense
+# Sensorium
 
 インタラクティブコンテンツの構想を入力すると、技術的な**成立条件**を明確化し、トレードオフ付きの**機材案**を提案する Web アプリ。利用者はテクニカルディレクタ。○×採点ではなく「どの条件なら成立し、どの境界で破綻するか」を言語化することが価値。
 
@@ -60,7 +60,7 @@ SensingChannel の `sense` role を埋める1つの流儀。Equipment の「2系
 _Avoid_: ストラテジ, ハンドラ, パイプライン
 
 **safety/circulation（安全・動線）**:
-Intrinsic な dimension。3つの下位チェックに分解する ── ①個人空間クリアランス（面積/人数 ≥ 最小占有面積、基準は usageModel × modality で変動）②動線・避難（通路・出入口、permanent で強化）③衝突半径（gesture の腕振り等の対人間隔）。基準値は既定値＋TD 上書き可能。**FeasiSense の安全判定は設計目安であり、建築基準・消防等の法令判断ではない**（その旨を出力に免責表示する）。
+Intrinsic な dimension。3つの下位チェックに分解する ── ①個人空間クリアランス（面積/人数 ≥ 最小占有面積、基準は usageModel × modality で変動）②動線・避難（通路・出入口、permanent で強化）③衝突半径（gesture の腕振り等の対人間隔）。基準値は既定値＋TD 上書き可能。**Sensorium の安全判定は設計目安であり、建築基準・消防等の法令判断ではない**（その旨を出力に免責表示する）。
 _Avoid_: 安全性検査, 法令チェック
 
 **MountPlan（設置仕様）**:
@@ -96,7 +96,7 @@ _Avoid_: 提案書（口語では可）, ドキュメント
 _Avoid_: 成立範囲（口語では可だが正式語は operating envelope）
 
 **downstreamAllowance（下流引当）**:
-体感レイテンシ（motion-to-photon）のうち、FeasiSense のスコープ外（認識処理・アプリロジック・描画・表示）に対する時間引当。エンジンはセンサー＋転送（`Equipment.latencyMs`）だけを責任を持って算出し、下流はこの引当として可視化する。responsiveness ティアごとにデフォルトを持ち、TD が上書き可能。latency 条件は `sensorLatency ≤ 総予算 − downstreamAllowance`。
+体感レイテンシ（motion-to-photon）のうち、Sensorium のスコープ外（認識処理・アプリロジック・描画・表示）に対する時間引当。エンジンはセンサー＋転送（`Equipment.latencyMs`）だけを責任を持って算出し、下流はこの引当として可視化する。responsiveness ティアごとにデフォルトを持ち、TD が上書き可能。latency 条件は `sensorLatency ≤ 総予算 − downstreamAllowance`。
 _Avoid_: バッファ, マージン
 
 **What-if**:

@@ -1,4 +1,4 @@
-import type { InteractionSpec } from '@feasisense/shared'
+import type { InteractionSpec } from '@sensorium/shared'
 
 /**
  * responsiveness → motion-to-photon 予算[ms]。

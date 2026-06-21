@@ -1,6 +1,6 @@
-import type { InteractionSpec } from '@feasisense/shared'
-import { evaluate, explain } from '@feasisense/engine'
-import { loadAllDetectionMethods, loadAllEquipment } from '@feasisense/engine/load-seeds'
+import type { InteractionSpec } from '@sensorium/shared'
+import { evaluate, explain } from '@sensorium/engine'
+import { loadAllDetectionMethods, loadAllEquipment } from '@sensorium/engine/load-seeds'
 
 /**
  * 入力（構想）→ 出力（機材案）を目で確認するための手回しツール。

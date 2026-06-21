@@ -1,4 +1,4 @@
-import { isFeasible, type DetectionMethod, type Setup } from '@feasisense/shared'
+import { isFeasible, type DetectionMethod, type Setup } from '@sensorium/shared'
 
 /**
  * Pareto フロンティア（論点B 段2）。多軸で「どの軸でも他案に勝てない＝被支配」案だけを

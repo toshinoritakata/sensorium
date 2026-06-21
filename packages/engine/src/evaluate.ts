@@ -8,7 +8,7 @@ import type {
   Phenomenon,
   PressureMat,
   Setup,
-} from '@feasisense/shared'
+} from '@sensorium/shared'
 import { canDetect, isSkeletalTarget } from './sensed-targets'
 import {
   consumedModality,

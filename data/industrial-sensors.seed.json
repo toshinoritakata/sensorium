@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "description": "FeasiSense 工業用センサー シード（手動キュレーション=status:active）。直接出力で粗い検出、DetectionMethod 不要。実機はDigiKey/Mouser経由取得が現実解。型番・価格は代表例で要検証。",
+    "description": "Sensorium 工業用センサー シード（手動キュレーション=status:active）。直接出力で粗い検出、DetectionMethod 不要。実機はDigiKey/Mouser経由取得が現実解。型番・価格は代表例で要検証。",
     "verifyPolicy": "型番/価格/詳細スペックは要検証(verify:true)。クラス特性(検出方式・応答時間オーダー)は confidence で表記。",
     "note": "servesModality は既存3軸に寄せて touch(近接系)/gesture(レーダー粗ジェスチャ)を使用。実体は presence/proximity/trigger 系。"
   },

@@ -5,7 +5,7 @@ import type {
   FeedbackKind,
   InputModality,
   Lighting,
-} from '@feasisense/shared'
+} from '@sensorium/shared'
 import { LIGHTING_LUX } from '../budgets'
 
 /**

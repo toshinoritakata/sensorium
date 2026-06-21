@@ -1,4 +1,4 @@
-# FeasiSense
+# Sensorium
 
 インタラクティブ体験の実現性検証＋機材提案 Web アプリ。設計は `docs/`（[DESIGN_OVERVIEW.md](docs/DESIGN_OVERVIEW.md) / [OVERVIEW_PLAIN.md](docs/OVERVIEW_PLAIN.md) / ADR）と `CONTEXT.md` を参照。
 

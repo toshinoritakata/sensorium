@@ -33,7 +33,7 @@ importers:
 
   packages/engine:
     dependencies:
-      '@feasisense/shared':
+      '@sensorium/shared':
         specifier: workspace:*
         version: link:../shared
 

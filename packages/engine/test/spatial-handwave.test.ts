@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { isFeasible, type EvaluateResult, type InteractionSpec, type Setup } from '@feasisense/shared'
+import { isFeasible, type EvaluateResult, type InteractionSpec, type Setup } from '@sensorium/shared'
 import { evaluate } from '../src/index'
 import { loadAllDetectionMethods, loadAllEquipment } from '../src/load-seeds'
 

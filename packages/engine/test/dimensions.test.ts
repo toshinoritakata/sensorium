@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { FeedbackKind } from '@feasisense/shared'
+import type { FeedbackKind } from '@sensorium/shared'
 import {
   budgetCondition,
   capacityCondition,

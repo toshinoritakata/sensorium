@@ -5,7 +5,7 @@ import {
   EquipmentSeedFileSchema,
   type DetectionMethod,
   type Equipment,
-} from '@feasisense/shared'
+} from '@sensorium/shared'
 
 /**
  * data/ のシードを読み込む（開発/テスト用ローダ）。

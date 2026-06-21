@@ -4,9 +4,9 @@
     "noEmit": true,
     "baseUrl": ".",
     "paths": {
-      "@feasisense/shared": ["packages/shared/src/index.ts"],
-      "@feasisense/engine": ["packages/engine/src/index.ts"],
-      "@feasisense/engine/load-seeds": ["packages/engine/src/load-seeds.ts"]
+      "@sensorium/shared": ["packages/shared/src/index.ts"],
+      "@sensorium/engine": ["packages/engine/src/index.ts"],
+      "@sensorium/engine/load-seeds": ["packages/engine/src/load-seeds.ts"]
     }
   },
   "include": ["packages/**/*.ts", "scripts/**/*.ts"]

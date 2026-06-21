@@ -1,9 +1,9 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { zodOutputFormat } from '@anthropic-ai/sdk/helpers/zod'
 import { z } from 'zod'
-import { InteractionSpecSchema, type InteractionSpec } from '@feasisense/shared'
-import { evaluate, explain } from '@feasisense/engine'
-import { loadAllDetectionMethods, loadAllEquipment } from '@feasisense/engine/load-seeds'
+import { InteractionSpecSchema, type InteractionSpec } from '@sensorium/shared'
+import { evaluate, explain } from '@sensorium/engine'
+import { loadAllDetectionMethods, loadAllEquipment } from '@sensorium/engine/load-seeds'
 
 /**
  * 入口（ingest）の最小実装（論点C）。自由文 → Claude が InteractionSpec を構造化抽出 → エンジン評価。
@@ -55,7 +55,7 @@ const ExtractionSchema = z.object({
     .describe('主要フィールドの出所（明記/推論/仮置き）'),
 })
 
-const SYSTEM = `あなたは FeasiSense の入口です。テクニカルディレクタの自由文から、体験の構造（InteractionSpec）を抽出します。
+const SYSTEM = `あなたは Sensorium の入口です。テクニカルディレクタの自由文から、体験の構造（InteractionSpec）を抽出します。
 - 抽出するのは「何を検出したい体験か」まで。**機材・センサー・製品の選定はしない**（それはエンジンの仕事）。
 - 文中に機材名があっても、それは制約ヒントとして読むだけで、出力には含めない。
 - 円形や畳など面積が間接的なら m² に換算する（円は π×半径²）。

@@ -4,7 +4,7 @@ import { defineConfig } from 'vitest/config'
 export default defineConfig({
   resolve: {
     alias: {
-      '@feasisense/shared': fileURLToPath(
+      '@sensorium/shared': fileURLToPath(
         new URL('./packages/shared/src/index.ts', import.meta.url),
       ),
     },

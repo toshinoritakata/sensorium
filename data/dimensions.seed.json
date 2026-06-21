@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "description": "FeasiSense 11次元の判定定義。各次元の currentValue 算出・hardThreshold(fail境界)・softMargin(warn帯)・系統。閾値は経験則デフォルトで全て調整可能。",
+    "description": "Sensorium 11次元の判定定義。各次元の currentValue 算出・hardThreshold(fail境界)・softMargin(warn帯)・系統。閾値は経験則デフォルトで全て調整可能。",
     "statusModel": "fail=hardThreshold侵犯(物理的に不成立) / warn=成立するがsoftMargin帯(余裕なし) / ok=帯より外で安定。CONTEXT.md status 参照。",
     "tuningNote": "数値は2026-01時点の現場経験則ベースの初期値。confidence: low の閾値は実プロジェクトで要キャリブ。TDが次元定義ごと上書き可能。",
     "industrialSensorNote": "工業用センサー系(presence-point/distance-1d/area-curtain/pressure-mat/motion-pir/radar-presence)は DetectionMethod を持たず直接出力。各次元の解釈を読み替える: latency=responseTimeMs(推論加算なし、低遅延が強み)。precision=機材自身の sensedTarget が必要targetを満たすか(ペア合成しない)。capacity=人体追跡数でなく『ゾーン/検出点の数 vs 必要弁別数』(感圧マット枚数・カーテンのビーム本数・配列数)。coverage=1台の検出範囲(sensingDistance/measureRange/coverageW×H/area_m2)×台数。occlusion=点/面検知は人の重なりに概ね強い(densityFactorを大幅低減 or 非適用)。"

@@ -1,7 +1,7 @@
 import { parseArgs } from 'node:util'
-import { InteractionSpecSchema, type InteractionSpec } from '@feasisense/shared'
-import { evaluate, explain } from '@feasisense/engine'
-import { loadAllDetectionMethods, loadAllEquipment } from '@feasisense/engine/load-seeds'
+import { InteractionSpecSchema, type InteractionSpec } from '@sensorium/shared'
+import { evaluate, explain } from '@sensorium/engine'
+import { loadAllDetectionMethods, loadAllEquipment } from '@sensorium/engine/load-seeds'
 
 /**
  * コマンドラインから構想を渡して機材案を検証するツール。
@@ -9,7 +9,7 @@ import { loadAllDetectionMethods, loadAllEquipment } from '@feasisense/engine/lo
  *   pnpm cli -- --phenomenon step --area 12 --users 4 --budget 800000 --feedback floor-visual
  */
 const USAGE = `
-FeasiSense 評価 CLI
+Sensorium 評価 CLI
 
 使い方:
   pnpm cli -- --phenomenon <target> [options]
